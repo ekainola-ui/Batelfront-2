@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Star Wars: Clone Campaign - Full Game + Admin + Droideka</title>
+    <style>
+        body {
+            margin: 0; background-color: #111; display: flex; justify-content: center; 
+            align-items: center; height: 100vh; color: #eee; font-family: 'Arial', sans-serif; 
+            overflow: hidden; touch-action: none;
+        }
+
+        /* --- MENÚS --- */
+        .menu { 
+            text-align: center; border: 2px solid #FFFF00; padding: 40px; 
+            background-color: rgba(0, 0, 0, 0.9); border-radius: 10px; width: 450px; 
+            position: absolute; z-index: 100;
+        }
+        #characterMenu, #settingsMenu, #gameContainer, #pauseOverlay { display: none; }
+        
+        .menu h1, .menu h2 { color: #FFFF00; font-size: 2.5em; margin-top: 0; margin-bottom: 30px; text-shadow: 2px 2px 5px #000; }
+        .menu h2 { font-size: 2em; }
+        .menu h3 { color: #FFFF00; margin-top: 40px; border-bottom: 1px solid #FFFF00; padding-bottom: 5px; }
+        
+        .menu-button { 
+            font-size: 1.5em; padding: 15px 30px; margin-top: 10px; width: 100%; 
+            cursor: pointer; background-color: #333; border: 2px solid #FFFF00; 
+            color: #FFFF00; border-radius: 5px; transition: all 0.2s ease-in-out; 
+        }
+        .menu-button:hover { background-color: #FFFF00; color: #000; box-shadow: 0 0 15px #FFFF00; }
+        
+        .setting-item { display: flex; justify-content: space-between; align-items: center; font-size: 1.2em; margin: 15px 0; }
+        .keybind-button { background-color: #444; border: 1px solid #aaa; color: #fff; padding: 5px 15px; min-width: 120px; text-align: center; cursor: pointer; }
+        .keybind-button.waiting { border-color: #FFFF00; color: #FFFF00; }
+        
+        #characterOptions { display: flex; justify-content: space-around; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .character-option { border: 3px solid #555; padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; flex: 1 1 30%; min-width: 120px; }
+        .character-option:hover { background-color: rgba(255, 255, 0, 0.1); border-color: #FFFF00; }
+        .character-option.selected { border-color: #00FFFF; background-color: rgba(0, 255, 255, 0.1); }
+        
+        /* --- ADMIN CONSOLE --- */
+        #pauseOverlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.85); flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 200; 
+        }
+        .admin-box { margin-top: 20px; padding: 15px; border: 1px dashed #555; background: #000; }
+        .admin-input { background: #111; border: 1px solid #FFFF00; color: #00FF00; padding: 10px; text-align: center; width: 80%; font-family: monospace; font-size: 1.1em; margin-bottom: 10px; }
+        
+        /* --- JUEGO --- */
+        #gameContainer { flex-direction: column; align-items: center; position: relative; }
+        canvas { border: 2px solid #FFFF00; background-color: #000; cursor: none; }
+        #infoPanel { width: 800px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 1.2em; }
+        
+        #bossHealthContainer { display: none; position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 500px; text-align: center; }
+        #bossHealthBar { width: 100%; height: 25px; background-color: #555; border: 2px solid #FFF; }
+        #bossHealthFill { width: 100%; height: 100%; background-color: #FF0000; transition: width 0.2s linear; }
+        #bossName { color: #FF0000; font-size: 1.5em; font-weight: bold; text-shadow: 1px 1px 5px #000; }
+
+        #skillModal { 
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background-color: rgba(0, 0, 0, 0.95); border: 2px solid #FFFF00; padding: 20px; 
+            text-align: center; z-index: 150; width: 500px; 
+            max-height: 80vh; overflow-y: auto; 
+        }
+        #skillModal h2 { margin-top: 0; color: #FFFF00; }
+        #skillModal button { background-color: #333; border: 1px solid #FFFF00; color: #FFFF00; padding: 12px 20px; margin: 8px; cursor: pointer; font-size: 1.1em; width: 100%; font-weight: bold; transition: 0.2s; }
+        #skillModal button:hover { background-color: #FFFF00; color: #000; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+    <div id="mainMenu" class="menu" style="display: block;">
+        <h1>Clone Campaign</h1>
+        <button id="playButton" class="menu-button">Jugar</button>
+        <button id="characterSelectButton" class="menu-button">Elegir Personaje</button>
+        <button id="settingsButton" class="menu-button">Ajustes</button>
+    </div>
+
+    <div id="characterMenu" class="menu">
+        <h2>Elige tu Soldado</h2>
+        <div id="characterOptions">
+            <div id="selectClone" class="character-option selected"><h3>Soldado Clon</h3></div>
+            <div id="select501" class="character-option"><h3>Clon 501</h3></div>
+            <div id="select327" class="character-option"><h3>Legión 327</h3></div>
+        </div>
+        <button id="backButton" class="menu-button">Volver</button>
+    </div>
+
+    <div id="settingsMenu" class="menu">
+        <h2>Ajustes</h2>
+        <div class="setting-item">
+            <label for="volumeSlider">Volumen:</label>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+            <span id="volumeValue">100%</span>
+        </div>
+        <h3>Controles</h3>
+        <div class="setting-item"><span>Mover Arriba</span><button class="keybind-button" id="rebindUp">w</button></div>
+        <div class="setting-item"><span>Mover Abajo</span><button class="keybind-button" id="rebindDown">s</button></div>
+        <div class="setting-item"><span>Mover Izquierda</span><button class="keybind-button" id="rebindLeft">a</button></div>
+        <div class="setting-item"><span>Mover Derecha</span><button class="keybind-button" id="rebindRight">d</button></div>
+        <button id="backButtonSettings" class="menu-button">Volver</button>
+    </div>
+
+    <div id="pauseOverlay">
+        <div class="menu" style="display: block; position: relative;">
+            <h2>PARTIDA EN PAUSA</h2>
+            <button class="menu-button" onclick="togglePause()">Reanudar</button>
+            
+            <div class="admin-box">
+                <p style="color: #aaa; font-size: 0.8em; margin-top:0;">CONSOLA DE COMANDOS</p>
+                <input type="text" id="adminCode" class="admin-input" placeholder="Introduce código...">
+                <button class="menu-button" style="font-size: 1em; padding: 10px;" onclick="applyAdminCode()">Ejecutar</button>
+                <p id="adminStatus" style="font-size: 0.9em; margin-top: 10px; height: 15px; font-weight: bold;"></p>
+            </div>
+            
+            <button class="menu-button" style="border-color: #f44; color: #f44;" onclick="location.reload()">Salir al Menú Principal</button>
+        </div>
+    </div>
+
+    <div id="gameContainer">
+        <div id="infoPanel">
+            <span id="health">Salud: 100</span>
+            <span id="killCounter">Bajas: 0</span>
+            <span id="experience">Experiencia: 0 / 100</span>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="skillModal">
+            <h2>¡NIVEL SUBIDO!</h2>
+            <p style="margin-top: 0; color: #aaa;">Elige una mejora táctica:</p>
+            <div id="skillOptions"></div>
+        </div>
+        <div id="bossHealthContainer">
+            <div id="bossName">JEFE</div>
+            <div id="bossHealthBar"><div id="bossHealthFill"></div></div>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop></audio>
+
+    <script>
+        // --- NAVEGACIÓN Y MENÚS ---
+        const mainMenu = document.getElementById('mainMenu');
+        const characterMenu = document.getElementById('characterMenu');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const gameContainer = document.getElementById('gameContainer');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800; canvas.height = 600;
+
+        const healthUI = document.getElementById('health');
+        const experienceUI = document.getElementById('experience');
+        const killCounterUI = document.getElementById('killCounter');
+        const skillModal = document.getElementById('skillModal');
+        const skillOptionsContainer = document.getElementById('skillOptions');
+        const bossHealthContainer = document.getElementById('bossHealthContainer');
+        const bossHealthFill = document.getElementById('bossHealthFill');
+        const bossName = document.getElementById('bossName');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        let volume = 1.0;
+
+        let player;
+        let selectedCharacter = 'clone';
+        let gamePaused = false;
+        let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+
+        let droidsKilled = 0;
+        let isEventActive = false;
+        let spawnIntervalID;
+        let eventToTrigger = null; 
+
+        // Configuración de controles
+        let controls = { up: 'w', down: 's', left: 'a', right: 'd' };
+        let currentRebind = null;
+        const rebindButtons = { up: document.getElementById('rebindUp'), down: document.getElementById('rebindDown'), left: document.getElementById('rebindLeft'), right: document.getElementById('rebindRight') };
+        
+        function loadControls() {
+            const savedControls = localStorage.getItem('cloneCampaignControls');
+            if (savedControls) { controls = JSON.parse(savedControls); }
+            for (const action in controls) { rebindButtons[action].textContent = controls[action]; }
+        }
+        function listenForKey(action) {
+            if (currentRebind) return;
+            currentRebind = action;
+            rebindButtons[action].textContent = 'Pulsa una tecla...';
+            rebindButtons[action].classList.add('waiting');
+        }
+        rebindButtons.up.addEventListener('click', () => listenForKey('up'));
+        rebindButtons.down.addEventListener('click', () => listenForKey('down'));
+        rebindButtons.left.addEventListener('click', () => listenForKey('left'));
+        rebindButtons.right.addEventListener('click', () => listenForKey('right'));
+
+        document.getElementById('characterSelectButton').onclick = () => { mainMenu.style.display = 'none'; characterMenu.style.display = 'block'; };
+        document.getElementById('settingsButton').onclick = () => { mainMenu.style.display = 'none'; settingsMenu.style.display = 'block'; };
+        document.getElementById('backButton').onclick = () => { characterMenu.style.display = 'none'; mainMenu.style.display = 'block'; };
+        document.getElementById('backButtonSettings').onclick = () => { settingsMenu.style.display = 'none'; mainMenu.style.display = 'block'; };
+        
+        document.getElementById('volumeSlider').addEventListener('input', (e) => {
+            volume = parseFloat(e.target.value); backgroundMusic.volume = volume;
+            document.getElementById('volumeValue').textContent = `${Math.round(volume * 100)}%`;
+        });
+
+        document.getElementById('selectClone').onclick = (e) => selectChar('clone', e.currentTarget);
+        document.getElementById('select501').onclick = (e) => selectChar('501', e.currentTarget);
+        document.getElementById('select327').onclick = (e) => selectChar('327', e.currentTarget);
+
+        function selectChar(type, el) {
+            selectedCharacter = type;
+            document.querySelectorAll('.character-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        document.getElementById('playButton').onclick = () => {
+            if (backgroundMusic.paused) backgroundMusic.play().catch(e => console.log("Audio requiere interacción."));
+            startGame();
+        };
+
+        function applyAdminCode() {
+            const code = document.getElementById('adminCode').value;
+            const status = document.getElementById('adminStatus');
+            
+            if (code === "1975") {
+                player.health = player.maxHealth; 
+                status.textContent = "¡CÓDIGO ACEPTADO! Abriendo arsenal...";
+                status.style.color = "#00FF00";
+                document.getElementById('adminCode').value = "";
+                
+                setTimeout(() => {
+                    status.textContent = "";
+                    pauseOverlay.style.display = 'none'; 
+                    levelUp(true); 
+                }, 1000);
+            } else {
+                status.textContent = "Código incorrecto o no autorizado.";
+                status.style.color = "#FF0000";
+                setTimeout(() => { status.textContent = ""; }, 4000);
+            }
+        }
+
+        // --- CLASES Y GRÁFICOS ---
+        function drawCrosshair() {
+            if (gamePaused) return;
+            ctx.save(); ctx.shadowColor = 'rgba(255, 0, 0, 0.7)'; ctx.shadowBlur = 8;
+            ctx.strokeStyle = '#FF0000'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(mouse.x - 12, mouse.y); ctx.lineTo(mouse.x - 3, mouse.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(mouse.x + 3, mouse.y); ctx.lineTo(mouse.x + 12, mouse.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y - 12); ctx.lineTo(mouse.x, mouse.y - 3); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y + 3); ctx.lineTo(mouse.x, mouse.y + 12); ctx.stroke();
+            ctx.restore();
+        }
+
+        class Player {
+            constructor(x, y, type) {
+                this.x = x; this.y = y; this.width = 40; this.height = 60; 
+                this.dx = 0; this.dy = 0; this.skills = []; this.canShoot = true;
+                this.type = type;
+                
+                this.speed = 5; this.health = 100; this.maxHealth = 100;
+                this.fireRate = 400; this.projectileSpeed = 7; this.damage = 10;
+                this.bulletSize = 5;
+                
+                this.xpMultiplier = 1.0; this.piercingShots = false; this.tripleShot = false;
+                this.hasRegen = false; this.hasMagnet = false; this.critChance = 0; this.critMultiplier = 2;
+                this.lifeSteal = false; this.evasionChance = 0; this.rearShot = false;
+                
+                if (this.type === '501') { this.health = 200; this.maxHealth = 200; this.projectileSpeed = 10; } 
+                else if (this.type === '327') { this.health = 75; this.maxHealth = 75; this.speed = 6.25; this.fireRate = 300; this.piercingShots = true; this.skills.push('Disparo Penetrante'); }
+            }
+            draw() {
+                ctx.strokeStyle = '#333333'; ctx.lineWidth = 2;
+                const bodyY = this.y + 24; const headX = this.x + this.width / 2; const headY = this.y + 12;
+                ctx.fillStyle = '#E0E0E0';
+                ctx.beginPath(); ctx.arc(headX, headY, 12, Math.PI, 0); ctx.lineTo(headX + 12, headY + 8); ctx.lineTo(headX - 12, headY + 8); ctx.closePath(); ctx.fill(); ctx.stroke();
+                if (this.type === '501') { ctx.fillStyle = '#0066CC'; ctx.fillRect(headX - 3, headY - 12, 6, 26); } 
+                else if (this.type === '327') { ctx.fillStyle = '#FFD700'; ctx.fillRect(headX - 3, headY - 12, 6, 26); }
+                ctx.fillStyle = '#000000'; ctx.fillRect(headX - 10, headY - 8, 20, 4);
+                
+                ctx.fillStyle = '#E0E0E0';
+                ctx.fillRect(this.x + 10, bodyY, 20, 30); ctx.strokeRect(this.x + 10, bodyY, 20, 30);
+                if (this.type === '501') { ctx.fillStyle = '#0066CC'; ctx.fillRect(this.x + 10, bodyY, 20, 8); } 
+                else if (this.type === '327') { ctx.fillStyle = '#FFD700'; ctx.fillRect(this.x + 10, bodyY + 5, 20, 8); }
+            }
+            update() {
+                this.x += this.dx; this.y += this.dy;
+                if (this.x < 0) this.x = 0; if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+                if (this.y < 0) this.y = 0; if (this.y + this.height > canvas.height) this.y = canvas.height - this.height;
+                this.draw();
+            }
+            shoot(targetX, targetY) {
+                if (!this.canShoot || gamePaused) return;
+                const shootOriginX = this.x + this.width / 2, shootOriginY = this.y + this.height / 2; 
+                const mainAngle = Math.atan2(targetY - shootOriginY, targetX - shootOriginX);
+                
+                if (this.tripleShot) {
+                    const spread = Math.PI / 12;
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, '#00FFFF', this.bulletSize));
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle - spread) * this.projectileSpeed, y: Math.sin(mainAngle - spread) * this.projectileSpeed }, '#00FFFF', this.bulletSize));
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle + spread) * this.projectileSpeed, y: Math.sin(mainAngle + spread) * this.projectileSpeed }, '#00FFFF', this.bulletSize));
+                } else {
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, '#00FFFF', this.bulletSize));
+                }
+
+                if (this.rearShot) {
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle + Math.PI) * this.projectileSpeed, y: Math.sin(mainAngle + Math.PI) * this.projectileSpeed }, '#00FFFF', this.bulletSize));
+                }
+
+                this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+        }
+
+        class Projectile {
+            constructor(x, y, velocity, color, radius, damage) { this.x = x; this.y = y; this.velocity = velocity; this.color = color; this.radius = radius; this.damage = damage; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
+            update() { this.x += this.velocity.x; this.y += this.velocity.y; this.draw(); }
+        }
+
+        class Droid {
+            constructor(x, y) {
+                this.x = x; this.y = y; this.width = 30; this.height = 50; 
+                this.health = 30; this.maxHealth = 30; this.speed = 1; this.expValue = 25;
+                this.fireRate = 5000; this.canShoot = true; this.projectileSpeed = 4;
+                this.hitboxRadius = this.width / 2; this.isBoss = false;
+                
+                this.countsAsKill = true; 
+            }
+            drawHealthBar() {
+                ctx.fillStyle = '#333'; ctx.fillRect(this.x, this.y - 15, this.width, 4);
+                ctx.fillStyle = '#FF0000'; ctx.fillRect(this.x, this.y - 15, this.width * (this.health / this.maxHealth), 4);
+            }
+            draw() {
+                ctx.fillStyle = '#C2B280'; ctx.strokeStyle = '#5C4033'; ctx.lineWidth = 1.5;
+                ctx.fillRect(this.x + 9, this.y - 10, 12, 20); ctx.strokeRect(this.x + 9, this.y - 10, 12, 20);
+                ctx.fillRect(this.x, this.y + 10, this.width, 25); ctx.strokeRect(this.x, this.y + 10, this.width, 25);
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused) return;
+                const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 6, 15));
+                this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+            update(player) {
+                const angle = Math.atan2((player.y + player.height/2) - (this.y + this.height/2), (player.x + player.width/2) - (this.x + this.width/2));
+                this.x += Math.cos(angle) * this.speed; this.y += Math.sin(angle) * this.speed;
+                this.shoot(player); this.draw(); if (!this.isBoss) this.drawHealthBar();
+            }
+        }
+
+        class SuperDroid extends Droid {
+            constructor(x, y) {
+                super(x, y);
+                this.health = 70; this.maxHealth = 70; this.expValue = 50; this.color = '#505050'; 
+                this.fireRate = 4000; this.projectileSpeed = 5; this.hitboxRadius = this.width / 2 + 5;
+            }
+            draw() {
+                ctx.fillStyle = this.color; ctx.strokeStyle = '#303030'; ctx.lineWidth = 2;
+                ctx.fillRect(this.x + 6, this.y - 12, 18, 25); ctx.strokeRect(this.x + 6, this.y - 12, 18, 25);
+                ctx.fillRect(this.x - 5, this.y + 10, this.width + 10, 35); ctx.strokeRect(this.x - 5, this.y + 10, this.width + 10, 35);
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused) return;
+                const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
+                const spreadAngle = Math.PI / 18;
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle - spreadAngle) * this.projectileSpeed, y: Math.sin(angle - spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle + spreadAngle) * this.projectileSpeed, y: Math.sin(angle + spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20));
+                this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+        }
+
+        class DroidGenerator {
+             constructor(x, y) {
+                this.x = x; this.y = y; this.width = 100; this.height = 80;
+                this.health = 4000; this.maxHealth = 4000; this.isBoss = true; this.hitboxRadius = 50; this.expValue = 200;
+                this.spawnTimer = setInterval(() => {
+                    if (!gamePaused && isEventActive) {
+                        let d1 = new Droid(this.x + 10, this.y + this.height);
+                        let d2 = new Droid(this.x + this.width - 40, this.y + this.height);
+                        let d3 = new SuperDroid(this.x + this.width / 2 - 15, this.y + this.height + 20);
+                        d1.countsAsKill = false; d2.countsAsKill = false; d3.countsAsKill = false;
+                        droids.push(d1, d2, d3);
+                    }
+                }, 5000); 
+            }
+            draw() {
+                ctx.fillStyle = '#444'; ctx.strokeStyle = '#888'; ctx.lineWidth = 4;
+                ctx.fillRect(this.x, this.y, this.width, this.height); ctx.strokeRect(this.x, this.y, this.width, this.height);
+                ctx.fillStyle = (Math.random() < 0.1) ? 'yellow' : 'red';
+                ctx.beginPath(); ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 10, 0, Math.PI * 2); ctx.fill();
+            }
+            update(player){ this.draw(); }
+            destroy() { clearInterval(this.spawnTimer); }
+        }
+
+        class SpiderDroid extends Droid {
+            constructor(x, y) {
+                super(x, y); this.width = 80; this.height = 80; this.health = 2700; this.maxHealth = 2700; 
+                this.expValue = 100; this.speed = 0.5; this.fireRate = 3000; this.projectileSpeed = 9; 
+                this.hitboxRadius = 40; this.isBoss = true;
+            }
+            draw() {
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                ctx.strokeStyle = '#8B0000'; ctx.lineWidth = 4;
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI / 4) * i + Math.PI / 8;
+                    ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(cX + Math.cos(angle)*60, cY + Math.sin(angle)*60); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(cX - Math.cos(angle)*60, cY - Math.sin(angle)*60); ctx.stroke();
+                }
+                ctx.fillStyle = '#A9A9A9'; ctx.strokeStyle = '#696969'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cX, cY, this.hitboxRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#FF0000'; ctx.beginPath(); ctx.arc(cX, cY, 8, 0, Math.PI * 2); ctx.fill();
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused) return;
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                const mainAngle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
+                const spread = Math.PI / 18, damage = 30; 
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, '#FF4500', 8, damage));
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle - spread) * this.projectileSpeed, y: Math.sin(mainAngle - spread) * this.projectileSpeed }, '#FF4500', 8, damage));
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle + spread) * this.projectileSpeed, y: Math.sin(mainAngle + spread) * this.projectileSpeed }, '#FF4500', 8, damage));
+                this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+        }
+
+        /* --- NUEVO JEFE: DROIDEKA --- */
+        class Droideka extends Droid {
+            constructor(x, y) {
+                super(x, y);
+                this.width = 60; this.height = 60;
+                this.health = 3500; this.maxHealth = 3500;
+                this.expValue = 250;
+                this.speed = 3; 
+                this.fireRate = 150; 
+                this.projectileSpeed = 8;
+                this.hitboxRadius = 40;
+                this.isBoss = true;
+                this.mode = 'roll'; // Puede ser 'roll' (rodar) o 'shoot' (disparar)
+                this.modeTimer = 0;
+            }
+            draw() {
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                ctx.lineWidth = 3;
+                
+                if (this.mode === 'roll') {
+                    // Modo rodar
+                    ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033';
+                    ctx.beginPath(); ctx.arc(cX, cY, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(cX, cY, 15, 0, Math.PI * 2); ctx.stroke();
+                } else {
+                    // Modo Disparo + Escudo
+                    ctx.fillStyle = 'rgba(0, 100, 255, 0.2)'; ctx.strokeStyle = '#00FFFF';
+                    ctx.beginPath(); ctx.arc(cX, cY, 40, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    
+                    ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033';
+                    ctx.beginPath(); ctx.arc(cX, cY, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    
+                    // Cañones
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(cX - 30, cY - 5, 20, 10);
+                    ctx.fillRect(cX + 10, cY - 5, 20, 10);
+                }
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused || this.mode === 'roll') return;
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                const angle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
+                
+                // Dispara desde un lado u otro alternando
+                const offset = (Math.random() > 0.5) ? 15 : -15;
+                const shootX = cX + Math.cos(angle + Math.PI/2) * offset;
+                const shootY = cY + Math.sin(angle + Math.PI/2) * offset;
+                
+                enemyProjectiles.push(new Projectile(shootX, shootY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 5, 12));
+                this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+            update(player) {
+                this.modeTimer++;
+                // Cambia de modo cada 3 segundos aprox
+                if (this.modeTimer > 180) { 
+                    this.mode = this.mode === 'roll' ? 'shoot' : 'roll';
+                    this.modeTimer = 0;
+                }
+
+                if (this.mode === 'roll') {
+                    const angle = Math.atan2((player.y + player.height/2) - (this.y + this.height/2), (player.x + player.width/2) - (this.x + this.width/2));
+                    this.x += Math.cos(angle) * this.speed; 
+                    this.y += Math.sin(angle) * this.speed;
+                } else {
+                    this.shoot(player);
+                }
+                this.draw();
+            }
+        }
+
+        class ExperienceOrb {
+            constructor(x, y, value) { this.x = x; this.y = y; this.value = value; this.radius = 5; this.speed = 3; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = '#FFFF00'; ctx.fill(); }
+            update(player) {
+                 let speed = this.speed;
+                 const dist = Math.hypot(player.x + player.width / 2 - this.x, player.y + player.height / 2 - this.y);
+                 if (player.hasMagnet && dist < 150) { speed *= 3; }
+                 const angle = Math.atan2(player.y + player.height / 2 - this.y, player.x + player.width / 2 - this.x);
+                 this.x += Math.cos(angle) * speed; this.y += Math.sin(angle) * speed; this.draw();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, velocity, color) { this.x = x; this.y = y; this.velocity = velocity; this.color = color; this.radius = Math.random() * 3 + 1; this.alpha = 1; }
+            draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); ctx.restore(); }
+            update() { this.x += this.velocity.x; this.y += this.velocity.y; this.alpha -= 0.01; this.draw(); }
+        }
+
+        let projectiles = [], enemyProjectiles = [], droids = [], experienceOrbs = [], particles = [];
+        let experience = 0, level = 1, experienceNeeded = 100, spawnInterval = 2000;
+        const keys = { up: false, down: false, left: false, right: false };
+
+        function togglePause() {
+            if (gameContainer.style.display !== 'flex' || skillModal.style.display === 'block') return;
+            gamePaused = !gamePaused;
+            if (gamePaused) {
+                backgroundMusic.pause(); canvas.style.cursor = 'default';
+                pauseOverlay.style.display = 'flex';
+            } else {
+                backgroundMusic.play(); canvas.style.cursor = 'none';
+                pauseOverlay.style.display = 'none';
+                animate();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const pk = e.key.toLowerCase();
+            if (currentRebind) {
+                if (e.key !== 'Escape') { controls[currentRebind] = pk; localStorage.setItem('cloneCampaignControls', JSON.stringify(controls)); }
+                for (const action in controls) { rebindButtons[action].textContent = controls[action]; }
+                rebindButtons[currentRebind].classList.remove('waiting'); currentRebind = null; return;
+            }
+            if (pk === controls.left) keys.left = true; if (pk === controls.right) keys.right = true;
+            if (pk === controls.up) keys.up = true; if (pk === controls.down) keys.down = true;
+            if (e.key === 'Escape') togglePause();
+        });
+        window.addEventListener('keyup', (e) => {
+            const rk = e.key.toLowerCase();
+            if (rk === controls.left) keys.left = false; if (rk === controls.right) keys.right = false;
+            if (rk === controls.up) keys.up = false; if (rk === controls.down) keys.down = false;
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect(); mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top;
+        });
+
+        function spawnDroids() {
+            clearInterval(spawnIntervalID); 
+            spawnIntervalID = setInterval(() => {
+                if (gamePaused || isEventActive) return;
+                const side = Math.floor(Math.random() * 4); let x, y;
+                if (side === 0) { x = Math.random() * canvas.width; y = -50; } else if (side === 1) { x = canvas.width + 50; y = Math.random() * canvas.height; }
+                else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 50; } else { x = -50; y = Math.random() * canvas.height; }
+                if (Math.random() < 0.20) droids.push(new SuperDroid(x, y)); else droids.push(new Droid(x, y));
+            }, spawnInterval);
+        }
+
+        function startEvent(type) {
+            isEventActive = true; clearInterval(spawnIntervalID); enemyProjectiles.length = 0; droids.length = 0; 
+            if (type === 'spider') { droids.push(new SpiderDroid(canvas.width / 2 - 40, 100)); bossName.textContent = 'DROIDE ARAÑA'; } 
+            else if (type === 'generator') { droids.push(new DroidGenerator(canvas.width / 2 - 50, 50)); bossName.textContent = 'GENERADOR DE DROIDES'; }
+            else if (type === 'droideka') { droids.push(new Droideka(canvas.width / 2 - 30, 100)); bossName.textContent = 'DROIDEKA DESTRUCTOR'; }
+            bossHealthContainer.style.display = 'block';
+        }
+
+        const allSkills = [
+            { name: 'Fuego Rápido', description: 'Aumenta cadencia de tiro.', apply: () => player.fireRate *= 0.75 },
+            { name: 'Disparo Penetrante', description: 'Atraviesa enemigos.', apply: () => player.piercingShots = true },
+            { name: 'Velocidad', description: 'Aumenta vel. de movimiento.', apply: () => player.speed *= 1.2 },
+            { name: 'Blindaje Extra', description: 'Aumenta salud base.', apply: () => { player.health += 25; player.maxHealth += 25; } },
+            { name: 'Potencia', description: 'Aumenta daño de las armas.', apply: () => player.damage *= 1.5 },
+            { name: 'XP Boost', description: '+50% recolección exp.', apply: () => player.xpMultiplier += 0.5 },
+            { name: 'Disparo Triple', description: 'Dispara tres láseres.', apply: () => player.tripleShot = true },
+            { name: 'Regeneración', description: 'Recupera vida pasivamente.', apply: () => player.hasRegen = true },
+            { name: 'Imán', description: 'Atrae orbes de experiencia.', apply: () => player.hasMagnet = true },
+            { name: 'Críticos', description: 'Probabilidad de doble daño.', apply: () => player.critChance += 0.10 },
+            { name: 'Sifón de Vida', description: 'Curas 2 HP por cada baja.', apply: () => player.lifeSteal = true },
+            { name: 'Evasión', description: '20% prob. de esquivar tiros.', apply: () => player.evasionChance += 0.20 },
+            { name: 'Balas Masivas', description: 'Láseres más grandes y letales.', apply: () => { player.bulletSize = 10; player.damage *= 1.2; } },
+            { name: 'Velocidad Láser', description: 'Láser viaja 50% más rápido.', apply: () => player.projectileSpeed *= 1.5 },
+            { name: 'Disparo Trasero', description: 'Dispara en dirección opuesta.', apply: () => player.rearShot = true },
+            { name: 'Titán', description: '+150 de Vida Máxima.', apply: () => { player.maxHealth += 150; player.health += 150; } }
+        ];
+
+        function levelUp(isAdmin = false) {
+            gamePaused = true; canvas.style.cursor = 'default'; skillModal.style.display = 'block';
+            skillOptionsContainer.innerHTML = '';
+            
+            const modalTitle = document.querySelector('#skillModal h2');
+            const modalDesc = document.querySelector('#skillModal p');
+            const availableSkills = allSkills.filter(s => !player.skills.includes(s.name));
+            let options = [];
+            
+            if (isAdmin) {
+                modalTitle.textContent = "MENÚ DE ADMIN";
+                modalTitle.style.color = "#00FF00";
+                modalDesc.textContent = "Elige la habilidad que quieras (Gratis):";
+                options = availableSkills; 
+                
+                if (options.length === 0) {
+                     skillOptionsContainer.innerHTML = '<p style="color: #00FF00; font-weight: bold;">¡Ya tienes todas las mejoras del juego!</p>';
+                     setTimeout(() => {
+                         skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate();
+                     }, 2000);
+                     return;
+                }
+            } else {
+                modalTitle.textContent = "¡NIVEL SUBIDO!";
+                modalTitle.style.color = "#FFFF00";
+                modalDesc.textContent = "Elige una mejora táctica:";
+                while(options.length < 3 && availableSkills.length > 0) { 
+                    options.push(availableSkills.splice(Math.floor(Math.random() * availableSkills.length), 1)[0]); 
+                }
+            }
+            
+            options.forEach(skill => {
+                const btn = document.createElement('button'); 
+                btn.innerHTML = `<span style="color:#FFF;">${skill.name}</span><br><span style="font-size:0.8em; color:#aaa; font-weight:normal;">${skill.description}</span>`;
+                if (isAdmin) btn.style.borderColor = "#00FF00"; 
+                
+                btn.onclick = () => {
+                    skill.apply(); player.skills.push(skill.name);
+                    
+                    if (!isAdmin) {
+                        level++; experience -= experienceNeeded; experienceNeeded = Math.floor(experienceNeeded * 1.5);
+                    }
+                    
+                    skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate();
+                };
+                skillOptionsContainer.appendChild(btn);
+            });
+        }
+
+        function updateUI() {
+            healthUI.textContent = `Salud: ${Math.ceil(player.health)} / ${player.maxHealth}`;
+            experienceUI.textContent = `Exp: ${Math.floor(experience)} / ${experienceNeeded}`;
+            killCounterUI.textContent = `Bajas: ${droidsKilled}`;
+            if (isEventActive) {
+                const boss = droids.find(d => d.isBoss);
+                if (boss) bossHealthFill.style.width = (boss.health / boss.maxHealth * 100) + '%';
+            }
+        }
+
+        function animate() {
+            if (gamePaused) return;
+            requestAnimationFrame(animate); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (player.hasRegen && player.health < player.maxHealth) player.health += 0.02;
+            player.dx = 0; player.dy = 0;
+            if (keys.left) player.dx = -player.speed; if (keys.right) player.dx = player.speed;
+            if (keys.up) player.dy = -player.speed; if (keys.down) player.dy = player.speed;
+            player.update(); player.shoot(mouse.x, mouse.y);
+            
+            particles.forEach((p, i) => { if(p.alpha <= 0) particles.splice(i, 1); else p.update(); });
+
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const proj = projectiles[i]; proj.update();
+                if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { projectiles.splice(i, 1); continue; }
+                let hitDroidInLoop = false; 
+                for (let j = droids.length - 1; j >= 0; j--) {
+                    const droid = droids[j]; let hitDetected = false;
+                    let dcX = droid.x + droid.width / 2, dcY = droid.y + droid.height / 2;
+                    
+                    if (droid instanceof DroidGenerator) { 
+                        if (proj.x > droid.x && proj.x < droid.x + droid.width && proj.y > droid.y && proj.y < droid.y + droid.height) hitDetected = true; 
+                    } else if (droid instanceof SpiderDroid || droid instanceof Droideka) { 
+                        if (Math.hypot(proj.x - dcX, proj.y - dcY) - droid.hitboxRadius - proj.radius < 1) hitDetected = true; 
+                    } else { 
+                        dcY += 10; if (Math.hypot(proj.x - dcX, proj.y - dcY) - droid.hitboxRadius - proj.radius < 1) hitDetected = true; 
+                    }
+
+                    if (hitDetected) {
+                        hitDroidInLoop = true; let hitDamage = player.damage;
+                        if (Math.random() < player.critChance) { hitDamage *= player.critMultiplier; for(let k=0; k<5; k++) particles.push(new Particle(proj.x, proj.y, {x:(Math.random()-0.5)*4, y:(Math.random()-0.5)*4}, '#FFFF00')); }
+                        droid.health -= hitDamage;
+                        if(!player.piercingShots) { projectiles.splice(i, 1); break; }
+                    }
+                } 
+                 if (hitDroidInLoop && !player.piercingShots) continue;
+            } 
+
+            let needsEventCheck = false;
+            for (let i = droids.length - 1; i >= 0; i--) {
+                const droid = droids[i];
+                if (droid.health <= 0) {
+                    if(!droid.isBoss && droid.countsAsKill) { 
+                        droidsKilled++; needsEventCheck = true; 
+                        if (player.lifeSteal) player.health = Math.min(player.maxHealth, player.health + 2);
+                    }
+                    for(let k=0; k < (droid.isBoss ? 50:10); k++) particles.push(new Particle(droid.x + droid.width/2, droid.y + droid.height/2, {x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 5}, '#C2B280'));
+                    experienceOrbs.push(new ExperienceOrb(droid.x + droid.width / 2, droid.y + droid.height / 2, droid.expValue)); 
+                    if(droid.isBoss) { if(typeof droid.destroy === 'function') droid.destroy(); isEventActive = false; bossHealthContainer.style.display = 'none'; spawnDroids(); }
+                    droids.splice(i, 1); 
+                }
+            }
+
+            // --- LÓGICA DE JEFES CICLICOS ---
+            if (needsEventCheck && !isEventActive) {
+                if (droidsKilled > 0) {
+                    if (droidsKilled % 60 === 0) eventToTrigger = 'droideka';
+                    else if (droidsKilled % 60 === 40) eventToTrigger = 'generator';
+                    else if (droidsKilled % 60 === 20) eventToTrigger = 'spider';
+                }
+            }
+            
+            if (eventToTrigger) { startEvent(eventToTrigger); eventToTrigger = null; }
+            
+            for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+                const proj = enemyProjectiles[i]; proj.update();
+                if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { enemyProjectiles.splice(i, 1); continue; }
+                
+                if (Math.hypot(proj.x - (player.x + player.width / 2), proj.y - (player.y + player.height / 2)) - (player.width / 2 * 0.8) - proj.radius < 1) { 
+                    if (Math.random() >= player.evasionChance) {
+                        player.health -= proj.damage;
+                    } else {
+                        for(let k=0; k<3; k++) particles.push(new Particle(player.x+player.width/2, player.y+player.height/2, {x:(Math.random()-0.5)*3, y:(Math.random()-0.5)*3}, '#00FFFF'));
+                    }
+                    enemyProjectiles.splice(i, 1);
+                    if (player.health <= 0) { player.health = 0; updateUI(); gamePaused = true; setTimeout(() => { alert("GAME OVER"); location.reload(); }, 100); }
+                }
+            }
+
+            experienceOrbs.forEach((orb, index) => {
+                orb.update(player);
+                if (Math.hypot(player.x + player.width / 2 - orb.x, player.y + player.height / 2 - orb.y) - player.width / 2 - orb.radius < 1) {
+                    experience += (orb.value * player.xpMultiplier);
+                    experienceOrbs.splice(index, 1);
+                }
+            });
+
+            if(experience >= experienceNeeded) levelUp();
+
+            droids.forEach(droid => droid.update(player));
+            updateUI(); drawCrosshair();
+        }
+
+        function startGame() {
+            mainMenu.style.display = 'none'; gameContainer.style.display = 'flex';
+            player = new Player(canvas.width / 2 - 20, canvas.height / 2 - 30, selectedCharacter);
+            droidsKilled = 0; experience = 0; level = 1; isEventActive = false; eventToTrigger = null;
+            droids = []; projectiles = []; enemyProjectiles = []; experienceOrbs = []; particles = []; 
+            bossHealthContainer.style.display = 'none'; backgroundMusic.volume = volume; spawnDroids(); animate();
+        }
+
+        loadControls();
+    </script>
+</body>
+</html>
