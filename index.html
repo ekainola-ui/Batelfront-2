@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Star Wars: Clone Campaign - Full Game + Admin + Droideka 2.0</title>
+    <title>Star Wars: Clone Campaign - Full Game + Admin + Droideka 3.0</title>
     <style>
         body {
             margin: 0; background-color: #111; display: flex; justify-content: center; 
@@ -422,12 +422,12 @@
             }
         }
 
-        /* --- NUEVO JEFE: DROIDEKA (CORREGIDO) --- */
+        /* --- NUEVO JEFE: DROIDEKA (MEJORADO) --- */
         class Droideka extends Droid {
             constructor(x, y) {
                 super(x, y);
                 this.width = 60; this.height = 60;
-                this.health = 6000; this.maxHealth = 6000; // Vida subida a 6000
+                this.health = 6000; this.maxHealth = 6000; 
                 this.expValue = 250;
                 this.speed = 3; 
                 this.projectileSpeed = 8;
@@ -435,7 +435,7 @@
                 this.isBoss = true;
                 this.mode = 'roll'; 
                 this.modeTimer = 0;
-                this.shootFrame = 0; // Nuevo contador por frames para evitar bugs
+                this.shootFrame = 0; 
             }
             draw() {
                 const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
@@ -461,7 +461,6 @@
                 }
             }
             shoot(player) {
-                // Generamos el disparo directamente, sin checkear this.canShoot
                 const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
                 const angle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
                 
@@ -470,15 +469,17 @@
                 const shootX = cX + Math.cos(angle + Math.PI/2) * offset;
                 const shootY = cY + Math.sin(angle + Math.PI/2) * offset;
                 
-                enemyProjectiles.push(new Projectile(shootX, shootY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 5, 12));
+                // --- CAMBIO AQUÍ: Radio del proyectil aumentado a 12 ---
+                enemyProjectiles.push(new Projectile(shootX, shootY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 12, 12));
             }
             update(player) {
                 this.modeTimer++;
-                // Cambia de modo cada 3 segundos aprox (180 frames)
-                if (this.modeTimer > 180) { 
+                
+                // --- CAMBIO AQUÍ: Ahora cambia de modo cada 2 segundos (120 frames) ---
+                if (this.modeTimer > 120) { 
                     this.mode = this.mode === 'roll' ? 'shoot' : 'roll';
                     this.modeTimer = 0;
-                    this.shootFrame = 0; // Reinicia el contador de disparo al cambiar de modo
+                    this.shootFrame = 0; 
                 }
 
                 if (this.mode === 'roll') {
@@ -489,7 +490,9 @@
                 } else {
                     // En modo combate, usa el contador de frames para disparar
                     this.shootFrame++;
-                    if (this.shootFrame >= 10) { // Cuanto menor sea el número, más rápido dispara (10 es una metralleta)
+                    
+                    // --- CAMBIO AQUÍ: Dispara cada 4 frames en lugar de cada 10 ---
+                    if (this.shootFrame >= 4) { 
                         this.shoot(player);
                         this.shootFrame = 0;
                     }
