@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Star Wars: Clone Campaign - Full Game + Admin + Droideka 3.0</title>
+    <title>Star Wars: Clone Campaign - Full Game + Admin + Droideka 3.0 + Oro</title>
     <style>
         body {
             margin: 0; background-color: #111; display: flex; justify-content: center; 
@@ -19,9 +19,15 @@
         }
         #characterMenu, #settingsMenu, #gameContainer, #pauseOverlay { display: none; }
         
+        #menuGoldDisplay { 
+            position: absolute; top: 20px; right: 30px; color: #FFD700; 
+            font-size: 1.8em; font-weight: bold; text-shadow: 2px 2px 5px #000; 
+            z-index: 110; display: block; border-bottom: 2px solid #FFD700; padding-bottom: 5px;
+        }
+
         .menu h1, .menu h2 { color: #FFFF00; font-size: 2.5em; margin-top: 0; margin-bottom: 30px; text-shadow: 2px 2px 5px #000; }
         .menu h2 { font-size: 2em; }
-        .menu h3 { color: #FFFF00; margin-top: 40px; border-bottom: 1px solid #FFFF00; padding-bottom: 5px; }
+        .menu h3 { color: #FFFF00; margin-top: 20px; border-bottom: 1px solid #FFFF00; padding-bottom: 5px; }
         
         .menu-button { 
             font-size: 1.5em; padding: 15px 30px; margin-top: 10px; width: 100%; 
@@ -35,10 +41,16 @@
         .keybind-button.waiting { border-color: #FFFF00; color: #FFFF00; }
         
         #characterOptions { display: flex; justify-content: space-around; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        .character-option { border: 3px solid #555; padding: 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; flex: 1 1 30%; min-width: 120px; }
+        .character-option { border: 3px solid #555; padding: 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; flex: 1 1 30%; min-width: 120px; }
         .character-option:hover { background-color: rgba(255, 255, 0, 0.1); border-color: #FFFF00; }
         .character-option.selected { border-color: #00FFFF; background-color: rgba(0, 255, 255, 0.1); }
+        .character-option.locked { border-color: #ff4444; opacity: 0.7; }
+        .character-option.locked:hover { border-color: #ff4444; background-color: rgba(255, 68, 68, 0.1); }
         
+        .status-text { margin: 5px 0 0 0; font-weight: bold; font-size: 1.1em; }
+        .cost-text { color: #FFD700; }
+        .unlocked-text { color: #00FF00; }
+
         /* --- ADMIN CONSOLE --- */
         #pauseOverlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -71,19 +83,30 @@
 </head>
 <body>
 
+    <div id="menuGoldDisplay">Oro: 0</div>
+
     <div id="mainMenu" class="menu" style="display: block;">
         <h1>Clone Campaign</h1>
         <button id="playButton" class="menu-button">Jugar</button>
-        <button id="characterSelectButton" class="menu-button">Elegir Personaje</button>
+        <button id="characterSelectButton" class="menu-button">Cuartel (Personajes)</button>
         <button id="settingsButton" class="menu-button">Ajustes</button>
     </div>
 
     <div id="characterMenu" class="menu">
         <h2>Elige tu Soldado</h2>
         <div id="characterOptions">
-            <div id="selectClone" class="character-option selected"><h3>Soldado Clon</h3></div>
-            <div id="select501" class="character-option"><h3>Clon 501</h3></div>
-            <div id="select327" class="character-option"><h3>Legión 327</h3></div>
+            <div id="selectClone" class="character-option selected" data-type="clone">
+                <h3>Soldado Clon</h3>
+                <p class="status-text unlocked-text">GRATIS</p>
+            </div>
+            <div id="select501" class="character-option locked" data-type="501">
+                <h3>Clon 501</h3>
+                <p class="status-text cost-text">100 Oro</p>
+            </div>
+            <div id="select327" class="character-option locked" data-type="327">
+                <h3>Legión 327</h3>
+                <p class="status-text cost-text">250 Oro</p>
+            </div>
         </div>
         <button id="backButton" class="menu-button">Volver</button>
     </div>
@@ -115,14 +138,14 @@
                 <p id="adminStatus" style="font-size: 0.9em; margin-top: 10px; height: 15px; font-weight: bold;"></p>
             </div>
             
-            <button class="menu-button" style="border-color: #f44; color: #f44;" onclick="location.reload()">Salir al Menú Principal</button>
+            <button class="menu-button" style="border-color: #f44; color: #f44;" onclick="dieAndExit()">Abandonar Partida</button>
         </div>
     </div>
 
     <div id="gameContainer">
         <div id="infoPanel">
             <span id="health">Salud: 100</span>
-            <span id="killCounter">Bajas: 0</span>
+            <span id="killCounter">Bajas (Oro): 0</span>
             <span id="experience">Experiencia: 0 / 100</span>
         </div>
         <canvas id="gameCanvas"></canvas>
@@ -140,6 +163,39 @@
     <audio id="backgroundMusic" loop></audio>
 
     <script>
+        // --- SISTEMA DE ORO Y PERSONAJES ---
+        let globalGold = parseInt(localStorage.getItem('cloneCampaignGold')) || 0;
+        let unlockedChars = JSON.parse(localStorage.getItem('cloneCampaignUnlockedChars')) || ['clone'];
+        const charPrices = { 'clone': 0, '501': 100, '327': 250 };
+        
+        const menuGoldDisplay = document.getElementById('menuGoldDisplay');
+        
+        function updateGoldUI() {
+            menuGoldDisplay.textContent = `Oro: ${globalGold}`;
+            localStorage.setItem('cloneCampaignGold', globalGold);
+        }
+        
+        function updateCharMenuUI() {
+            document.querySelectorAll('.character-option').forEach(opt => {
+                const type = opt.getAttribute('data-type');
+                const statusP = opt.querySelector('.status-text');
+                
+                if (unlockedChars.includes(type)) {
+                    opt.classList.remove('locked');
+                    statusP.textContent = "DESBLOQUEADO";
+                    statusP.className = "status-text unlocked-text";
+                } else {
+                    opt.classList.add('locked');
+                    statusP.textContent = `${charPrices[type]} Oro`;
+                    statusP.className = "status-text cost-text";
+                }
+            });
+        }
+        
+        // Inicializar UI de menús
+        updateGoldUI();
+        updateCharMenuUI();
+
         // --- NAVEGACIÓN Y MENÚS ---
         const mainMenu = document.getElementById('mainMenu');
         const characterMenu = document.getElementById('characterMenu');
@@ -202,15 +258,35 @@
             document.getElementById('volumeValue').textContent = `${Math.round(volume * 100)}%`;
         });
 
-        document.getElementById('selectClone').onclick = (e) => selectChar('clone', e.currentTarget);
-        document.getElementById('select501').onclick = (e) => selectChar('501', e.currentTarget);
-        document.getElementById('select327').onclick = (e) => selectChar('327', e.currentTarget);
-
-        function selectChar(type, el) {
-            selectedCharacter = type;
-            document.querySelectorAll('.character-option').forEach(opt => opt.classList.remove('selected'));
-            el.classList.add('selected');
-        }
+        // Lógica de compra y selección
+        document.querySelectorAll('.character-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                const type = e.currentTarget.getAttribute('data-type');
+                
+                if (!unlockedChars.includes(type)) {
+                    // Intento de compra
+                    if (globalGold >= charPrices[type]) {
+                        if (confirm(`¿Quieres reclutar este soldado por ${charPrices[type]} de oro?`)) {
+                            globalGold -= charPrices[type];
+                            unlockedChars.push(type);
+                            localStorage.setItem('cloneCampaignUnlockedChars', JSON.stringify(unlockedChars));
+                            updateGoldUI();
+                            updateCharMenuUI();
+                        } else {
+                            return; // Compra cancelada
+                        }
+                    } else {
+                        alert("¡No tienes suficiente oro para este recluta! Sal al campo de batalla a destruir chatarra.");
+                        return;
+                    }
+                }
+                
+                // Si está desbloqueado (o se acaba de comprar), se selecciona
+                selectedCharacter = type;
+                document.querySelectorAll('.character-option').forEach(o => o.classList.remove('selected'));
+                e.currentTarget.classList.add('selected');
+            });
+        });
 
         document.getElementById('playButton').onclick = () => {
             if (backgroundMusic.paused) backgroundMusic.play().catch(e => console.log("Audio requiere interacción."));
@@ -221,6 +297,7 @@
             const code = document.getElementById('adminCode').value;
             const status = document.getElementById('adminStatus');
             
+            // ADMIN COMANDOS EXTENDIDOS
             if (code === "1975") {
                 player.health = player.maxHealth; 
                 status.textContent = "¡CÓDIGO ACEPTADO! Abriendo arsenal...";
@@ -232,11 +309,32 @@
                     pauseOverlay.style.display = 'none'; 
                     levelUp(true); 
                 }, 1000);
+            } else if (code === "midas") {
+                globalGold += 1000;
+                updateGoldUI();
+                status.textContent = "¡CÓDIGO ACEPTADO! +1000 Oro añadido.";
+                status.style.color = "#FFD700";
+                document.getElementById('adminCode').value = "";
+                setTimeout(() => { status.textContent = ""; }, 2000);
             } else {
                 status.textContent = "Código incorrecto o no autorizado.";
                 status.style.color = "#FF0000";
                 setTimeout(() => { status.textContent = ""; }, 4000);
             }
+        }
+
+        function dieAndExit() {
+            // Guardar el oro antes de salir
+            globalGold += droidsKilled;
+            updateGoldUI();
+            location.reload();
+        }
+
+        function triggerGameOver() {
+            globalGold += droidsKilled; // 1 Kill = 1 Oro
+            updateGoldUI();
+            alert(`GAME OVER.\nHas sobrevivido y eliminado a ${droidsKilled} droides.\n¡Has ganado ${droidsKilled} de Oro!`);
+            location.reload();
         }
 
         // --- CLASES Y GRÁFICOS ---
@@ -422,7 +520,6 @@
             }
         }
 
-        /* --- NUEVO JEFE: DROIDEKA (MEJORADO) --- */
         class Droideka extends Droid {
             constructor(x, y) {
                 super(x, y);
@@ -442,19 +539,14 @@
                 ctx.lineWidth = 3;
                 
                 if (this.mode === 'roll') {
-                    // Modo rodar
                     ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033';
                     ctx.beginPath(); ctx.arc(cX, cY, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
                     ctx.beginPath(); ctx.arc(cX, cY, 15, 0, Math.PI * 2); ctx.stroke();
                 } else {
-                    // Modo Disparo + Escudo
                     ctx.fillStyle = 'rgba(0, 100, 255, 0.2)'; ctx.strokeStyle = '#00FFFF';
                     ctx.beginPath(); ctx.arc(cX, cY, 40, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                    
                     ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033';
                     ctx.beginPath(); ctx.arc(cX, cY, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                    
-                    // Cañones
                     ctx.fillStyle = '#333';
                     ctx.fillRect(cX - 30, cY - 5, 20, 10);
                     ctx.fillRect(cX + 10, cY - 5, 20, 10);
@@ -463,19 +555,13 @@
             shoot(player) {
                 const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
                 const angle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
-                
-                // Dispara desde un lado u otro alternando
                 const offset = (Math.random() > 0.5) ? 15 : -15;
                 const shootX = cX + Math.cos(angle + Math.PI/2) * offset;
                 const shootY = cY + Math.sin(angle + Math.PI/2) * offset;
-                
-                // --- CAMBIO AQUÍ: Radio del proyectil aumentado a 12 ---
                 enemyProjectiles.push(new Projectile(shootX, shootY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 12, 12));
             }
             update(player) {
                 this.modeTimer++;
-                
-                // --- CAMBIO AQUÍ: Ahora cambia de modo cada 2 segundos (120 frames) ---
                 if (this.modeTimer > 120) { 
                     this.mode = this.mode === 'roll' ? 'shoot' : 'roll';
                     this.modeTimer = 0;
@@ -483,15 +569,11 @@
                 }
 
                 if (this.mode === 'roll') {
-                    // En modo rodar solo se mueve hacia el jugador
                     const angle = Math.atan2((player.y + player.height/2) - (this.y + this.height/2), (player.x + player.width/2) - (this.x + this.width/2));
                     this.x += Math.cos(angle) * this.speed; 
                     this.y += Math.sin(angle) * this.speed;
                 } else {
-                    // En modo combate, usa el contador de frames para disparar
                     this.shootFrame++;
-                    
-                    // --- CAMBIO AQUÍ: Dispara cada 4 frames en lugar de cada 10 ---
                     if (this.shootFrame >= 4) { 
                         this.shoot(player);
                         this.shootFrame = 0;
@@ -646,7 +728,7 @@
         function updateUI() {
             healthUI.textContent = `Salud: ${Math.ceil(player.health)} / ${player.maxHealth}`;
             experienceUI.textContent = `Exp: ${Math.floor(experience)} / ${experienceNeeded}`;
-            killCounterUI.textContent = `Bajas: ${droidsKilled}`;
+            killCounterUI.textContent = `Bajas (Oro): ${droidsKilled}`;
             if (isEventActive) {
                 const boss = droids.find(d => d.isBoss);
                 if (boss) bossHealthFill.style.width = (boss.health / boss.maxHealth * 100) + '%';
@@ -706,7 +788,6 @@
                 }
             }
 
-            // --- LÓGICA DE JEFES CICLICOS ---
             if (needsEventCheck && !isEventActive) {
                 if (droidsKilled > 0) {
                     if (droidsKilled % 60 === 0) eventToTrigger = 'droideka';
@@ -728,7 +809,12 @@
                         for(let k=0; k<3; k++) particles.push(new Particle(player.x+player.width/2, player.y+player.height/2, {x:(Math.random()-0.5)*3, y:(Math.random()-0.5)*3}, '#00FFFF'));
                     }
                     enemyProjectiles.splice(i, 1);
-                    if (player.health <= 0) { player.health = 0; updateUI(); gamePaused = true; setTimeout(() => { alert("GAME OVER"); location.reload(); }, 100); }
+                    if (player.health <= 0) { 
+                        player.health = 0; 
+                        updateUI(); 
+                        gamePaused = true; 
+                        setTimeout(triggerGameOver, 100); 
+                    }
                 }
             }
 
@@ -747,10 +833,14 @@
         }
 
         function startGame() {
-            mainMenu.style.display = 'none'; gameContainer.style.display = 'flex';
+            mainMenu.style.display = 'none'; 
+            menuGoldDisplay.style.display = 'none'; // Ocultar oro en la partida para no estorbar
+            gameContainer.style.display = 'flex';
+            
             player = new Player(canvas.width / 2 - 20, canvas.height / 2 - 30, selectedCharacter);
             droidsKilled = 0; experience = 0; level = 1; isEventActive = false; eventToTrigger = null;
             droids = []; projectiles = []; enemyProjectiles = []; experienceOrbs = []; particles = []; 
+            
             bossHealthContainer.style.display = 'none'; backgroundMusic.volume = volume; spawnDroids(); animate();
         }
 
