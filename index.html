@@ -363,6 +363,39 @@
                 status.style.color = "#FFD700";
                 document.getElementById('adminCode').value = "";
                 setTimeout(() => { status.textContent = ""; }, 2000);
+            } else if (code === "skipwave") {
+                document.getElementById('adminCode').value = "";
+                if (isEventActive) {
+                    // Hay un jefe activo: lo eliminamos limpiamente
+                    for (let i = droids.length - 1; i >= 0; i--) {
+                        if (droids[i].isBoss) {
+                            if (typeof droids[i].destroy === 'function') droids[i].destroy();
+                            experienceOrbs.push(new ExperienceOrb(droids[i].x + droids[i].width / 2, droids[i].y + droids[i].height / 2, droids[i].expValue));
+                            droids.splice(i, 1);
+                        }
+                    }
+                    droids.length = 0;
+                    enemyProjectiles.length = 0;
+                    isEventActive = false;
+                    bossHealthContainer.style.display = 'none';
+                    totalBossesStats++;
+                    localStorage.setItem('cloneCampaignTotalBosses', totalBossesStats);
+                    spawnDroids();
+                    status.textContent = "¡OLEADA SALTADA!";
+                } else {
+                    // Oleada normal: forzar el siguiente evento inmediatamente
+                    droids.length = 0;
+                    enemyProjectiles.length = 0;
+                    clearInterval(spawnIntervalID);
+                    // Avanzar el contador al siguiente múltiplo de 20 para respetar la secuencia
+                    droidsKilled = Math.ceil((droidsKilled + 1) / 20) * 20;
+                    const cycle = (droidsKilled / 20) % 3;
+                    const nextEvent = cycle === 1 ? 'spider' : cycle === 2 ? 'generator' : 'droideka';
+                    startEvent(nextEvent);
+                    status.textContent = "¡OLEADA SALTADA!";
+                }
+                status.style.color = "#00FFFF";
+                setTimeout(() => { status.textContent = ""; pauseOverlay.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; if (animationId) { cancelAnimationFrame(animationId); animationId = null; } animate(); }, 1000);
             } else {
                 status.textContent = "Código incorrecto.";
                 status.style.color = "#FF0000";
