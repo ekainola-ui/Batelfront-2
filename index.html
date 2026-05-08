@@ -10,40 +10,31 @@
             align-items: center; height: 100vh; color: #eee; font-family: 'Arial', sans-serif; 
             overflow: hidden; touch-action: none;
         }
-
-        /* --- MENÚS --- */
         .menu { 
             text-align: center; border: 2px solid #FFFF00; padding: 40px; 
             background-color: rgba(0, 0, 0, 0.9); border-radius: 10px; width: 450px; 
             position: absolute; z-index: 100;
         }
         #characterMenu, #settingsMenu, #gameContainer, #pauseOverlay, #achievementsMenu { display: none; }
-        
-        /* Ajustes para el cuartel más grande */
         #characterMenu { width: 650px; } 
         #achievementsMenu { width: 550px; }
-
         #menuGoldDisplay { 
             position: absolute; top: 20px; right: 30px; color: #FFD700; 
             font-size: 1.8em; font-weight: bold; text-shadow: 2px 2px 5px #000; 
             z-index: 110; display: block; border-bottom: 2px solid #FFD700; padding-bottom: 5px;
         }
-
         .menu h1, .menu h2 { color: #FFFF00; font-size: 2.5em; margin-top: 0; margin-bottom: 30px; text-shadow: 2px 2px 5px #000; }
         .menu h2 { font-size: 2em; margin-bottom: 20px; }
         .menu h3 { color: #FFFF00; margin-top: 15px; border-bottom: 1px solid #FFFF00; padding-bottom: 5px; margin-bottom: 10px; }
-        
         .menu-button { 
             font-size: 1.5em; padding: 15px 30px; margin-top: 10px; width: 100%; 
             cursor: pointer; background-color: #333; border: 2px solid #FFFF00; 
             color: #FFFF00; border-radius: 5px; transition: all 0.2s ease-in-out; 
         }
         .menu-button:hover { background-color: #FFFF00; color: #000; box-shadow: 0 0 15px #FFFF00; }
-        
         .setting-item { display: flex; justify-content: space-between; align-items: center; font-size: 1.2em; margin: 15px 0; }
         .keybind-button { background-color: #444; border: 1px solid #aaa; color: #fff; padding: 5px 15px; min-width: 120px; text-align: center; cursor: pointer; }
         .keybind-button.waiting { border-color: #FFFF00; color: #FFFF00; }
-        
         #characterOptions { display: flex; justify-content: space-around; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
         .character-option { border: 3px solid #555; padding: 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; flex: 1 1 30%; min-width: 150px; text-align: center; }
         .character-option h3 { margin-top: 0; font-size: 1.2em; }
@@ -52,17 +43,13 @@
         .character-option.selected { border-color: #00FFFF; background-color: rgba(0, 255, 255, 0.1); }
         .character-option.locked { border-color: #ff4444; opacity: 0.7; }
         .character-option.locked:hover { border-color: #ff4444; background-color: rgba(255, 68, 68, 0.1); }
-        
         .status-text { margin: 8px 0 0 0 !important; font-weight: bold; font-size: 1em !important; }
         .cost-text { color: #FFD700 !important; }
         .unlocked-text { color: #00FF00 !important; }
-
-        /* --- LOGROS --- */
         #achievementsList { max-height: 350px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; text-align: left; }
         #achievementsList::-webkit-scrollbar { width: 8px; }
         #achievementsList::-webkit-scrollbar-track { background: #222; border-radius: 4px; }
         #achievementsList::-webkit-scrollbar-thumb { background: #FFFF00; border-radius: 4px; }
-        
         .achievement-item { background-color: #222; border: 2px solid #555; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
         .achievement-item.unlocked { border-color: #FFD700; background-color: rgba(255, 215, 0, 0.1); box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2); }
         .achievement-icon { font-size: 2.2em; margin-right: 15px; filter: grayscale(100%); opacity: 0.4; transition: 0.3s; }
@@ -74,22 +61,16 @@
         .achievement-status { font-weight: bold; font-size: 0.9em; text-align: right; min-width: 100px; }
         .achievement-status.unlocked-label { color: #00FF00; }
         .achievement-status.locked-label { color: #555; }
-
-        /* --- ADMIN CONSOLE --- */
         #pauseOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); flex-direction: column; justify-content: center; align-items: center; z-index: 200; }
         .admin-box { margin-top: 20px; padding: 15px; border: 1px dashed #555; background: #000; }
         .admin-input { background: #111; border: 1px solid #FFFF00; color: #00FF00; padding: 10px; text-align: center; width: 80%; font-family: monospace; font-size: 1.1em; margin-bottom: 10px; }
-        
-        /* --- JUEGO --- */
         #gameContainer { flex-direction: column; align-items: center; position: relative; }
         canvas { border: 2px solid #FFFF00; background-color: #000; cursor: none; }
         #infoPanel { width: 800px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 1.2em; }
-        
         #bossHealthContainer { display: none; position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 500px; text-align: center; }
         #bossHealthBar { width: 100%; height: 25px; background-color: #555; border: 2px solid #FFF; }
         #bossHealthFill { width: 100%; height: 100%; background-color: #FF0000; transition: width 0.2s linear; }
         #bossName { color: #FF0000; font-size: 1.5em; font-weight: bold; text-shadow: 1px 1px 5px #000; }
-
         #skillModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.95); border: 2px solid #FFFF00; padding: 20px; text-align: center; z-index: 150; width: 500px; max-height: 80vh; overflow-y: auto; }
         #skillModal h2 { margin-top: 0; color: #FFFF00; }
         #skillModal button { background-color: #333; border: 1px solid #FFFF00; color: #FFFF00; padding: 12px 20px; margin: 8px; cursor: pointer; font-size: 1.1em; width: 100%; font-weight: bold; transition: 0.2s; }
@@ -112,34 +93,22 @@
         <h2>Elige tu Soldado</h2>
         <div id="characterOptions">
             <div id="selectClone" class="character-option selected" data-type="clone">
-                <h3>Soldado Clon</h3>
-                <p>Equilibrio básico.</p>
-                <p class="status-text unlocked-text">GRATIS</p>
+                <h3>Soldado Clon</h3><p>Equilibrio básico.</p><p class="status-text unlocked-text">GRATIS</p>
             </div>
             <div id="select501" class="character-option locked" data-type="501">
-                <h3>Clon 501</h3>
-                <p>Más vida y potencia.</p>
-                <p class="status-text cost-text">100 Oro</p>
+                <h3>Clon 501</h3><p>Más vida y potencia.</p><p class="status-text cost-text">100 Oro</p>
             </div>
             <div id="select327" class="character-option locked" data-type="327">
-                <h3>Legión 327</h3>
-                <p>Rápido y penetrante.</p>
-                <p class="status-text cost-text">250 Oro</p>
+                <h3>Legión 327</h3><p>Rápido y penetrante.</p><p class="status-text cost-text">250 Oro</p>
             </div>
             <div id="selectRex" class="character-option locked" data-type="rex">
-                <h3>Capitán Rex</h3>
-                <p>Líder ofensivo.</p>
-                <p class="status-text cost-text">500 Oro</p>
+                <h3>Capitán Rex</h3><p>Líder ofensivo.</p><p class="status-text cost-text">500 Oro</p>
             </div>
             <div id="selectArc" class="character-option locked" data-type="arc">
-                <h3>Soldado ARC</h3>
-                <p>Velocidad y agilidad.</p>
-                <p class="status-text cost-text">750 Oro</p>
+                <h3>Soldado ARC</h3><p>Velocidad y agilidad.</p><p class="status-text cost-text">750 Oro</p>
             </div>
             <div id="selectCommando" class="character-option locked" data-type="commando">
-                <h3>Comando Clon</h3>
-                <p>Potencia pesada.</p>
-                <p class="status-text cost-text">1000 Oro</p>
+                <h3>Comando Clon</h3><p>Potencia pesada.</p><p class="status-text cost-text">1000 Oro</p>
             </div>
         </div>
         <button id="backButton" class="menu-button">Volver</button>
@@ -201,27 +170,28 @@
     <audio id="backgroundMusic" loop></audio>
 
     <script>
-        // --- SISTEMA DE ORO, ESTADÍSTICAS Y PERSONAJES ---
+        // =============================================================
+        // SISTEMA DE ORO, ESTADÍSTICAS Y PERSONAJES
+        // =============================================================
         let globalGold = parseInt(localStorage.getItem('cloneCampaignGold')) || 0;
         let unlockedChars = JSON.parse(localStorage.getItem('cloneCampaignUnlockedChars')) || ['clone'];
         let totalKillsStats = parseInt(localStorage.getItem('cloneCampaignTotalKills')) || 0;
         let totalBossesStats = parseInt(localStorage.getItem('cloneCampaignTotalBosses')) || 0;
+        // AVISO #7: persistir logros desbloqueados para que no se "re-bloqueen" al gastar oro
+        let unlockedAchievements = JSON.parse(localStorage.getItem('cloneCampaignAchievements')) || [];
 
-        // --- PRECIOS ACTUALIZADOS ---
         const charPrices = { 'clone': 0, '501': 100, '327': 250, 'rex': 500, 'arc': 750, 'commando': 1000 };
-        
         const menuGoldDisplay = document.getElementById('menuGoldDisplay');
-        
+
         function updateGoldUI() {
             menuGoldDisplay.textContent = `Oro: ${globalGold}`;
             localStorage.setItem('cloneCampaignGold', globalGold);
         }
-        
+
         function updateCharMenuUI() {
             document.querySelectorAll('.character-option').forEach(opt => {
                 const type = opt.getAttribute('data-type');
                 const statusP = opt.querySelector('.status-text');
-                
                 if (unlockedChars.includes(type)) {
                     opt.classList.remove('locked');
                     statusP.textContent = "DESBLOQUEADO";
@@ -233,11 +203,13 @@
                 }
             });
         }
-        
+
         updateGoldUI();
         updateCharMenuUI();
 
-        // --- SISTEMA DE LOGROS ---
+        // =============================================================
+        // SISTEMA DE LOGROS
+        // =============================================================
         const achievementsData = [
             { id: 'first_blood', title: 'Primera Sangre', desc: 'Destruye a tu primer droide.', icon: '💥', req: () => totalKillsStats >= 1 },
             { id: 'soldier', title: 'Soldado Raso', desc: 'Destruye 100 droides en total.', icon: '🔫', req: () => totalKillsStats >= 100 },
@@ -245,32 +217,37 @@
             { id: 'boss_slayer', title: 'Cazajefes', desc: 'Derrota a tu primer jefe.', icon: '👹', req: () => totalBossesStats >= 1 },
             { id: 'hero', title: 'Héroe de la República', desc: 'Derrota a 10 jefes.', icon: '🏆', req: () => totalBossesStats >= 10 },
             { id: 'rich', title: 'Mercenario', desc: 'Acumula 1,000 de oro.', icon: '💰', req: () => globalGold >= 1000 },
-            // --- ACTUALIZADO LOGRO DE COMANDANTE ---
             { id: 'commander', title: 'Comandante Clon', desc: 'Desbloquea a los 6 personajes.', icon: '🎖️', req: () => unlockedChars.length >= 6 }
         ];
 
         function renderAchievements() {
             const list = document.getElementById('achievementsList');
             list.innerHTML = '';
+            let changed = false;
             achievementsData.forEach(ach => {
-                const isUnlocked = ach.req();
+                // AVISO #7: un logro desbloqueado lo queda para siempre (se persiste en localStorage)
+                const justUnlocked = ach.req();
+                if (justUnlocked && !unlockedAchievements.includes(ach.id)) {
+                    unlockedAchievements.push(ach.id);
+                    changed = true;
+                }
+                const isUnlocked = unlockedAchievements.includes(ach.id);
+                if (changed) localStorage.setItem('cloneCampaignAchievements', JSON.stringify(unlockedAchievements));
                 const statusClass = isUnlocked ? 'unlocked-label' : 'locked-label';
                 const statusText = isUnlocked ? 'DESBLOQUEADO' : 'BLOQUEADO';
                 const itemClass = isUnlocked ? 'achievement-item unlocked' : 'achievement-item';
                 list.innerHTML += `
                     <div class="${itemClass}">
                         <div class="achievement-icon">${ach.icon}</div>
-                        <div class="achievement-info">
-                            <h4>${ach.title}</h4>
-                            <p>${ach.desc}</p>
-                        </div>
+                        <div class="achievement-info"><h4>${ach.title}</h4><p>${ach.desc}</p></div>
                         <div class="achievement-status ${statusClass}">${statusText}</div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
-        // --- NAVEGACIÓN Y MENÚS ---
+        // =============================================================
+        // NAVEGACIÓN Y MENÚS
+        // =============================================================
         const mainMenu = document.getElementById('mainMenu');
         const characterMenu = document.getElementById('characterMenu');
         const settingsMenu = document.getElementById('settingsMenu');
@@ -299,18 +276,28 @@
         let droidsKilled = 0;
         let isEventActive = false;
         let spawnIntervalID;
-        let eventToTrigger = null; 
+        let eventToTrigger = null;
 
-        // Configuración de controles
+        // -------------------------------------------------------
+        // FIX CRÍTICO #5: animationId para evitar bucles múltiples
+        // -------------------------------------------------------
+        let animationId = null;
+
         let controls = { up: 'w', down: 's', left: 'a', right: 'd' };
         let currentRebind = null;
-        const rebindButtons = { up: document.getElementById('rebindUp'), down: document.getElementById('rebindDown'), left: document.getElementById('rebindLeft'), right: document.getElementById('rebindRight') };
-        
+        const rebindButtons = {
+            up: document.getElementById('rebindUp'),
+            down: document.getElementById('rebindDown'),
+            left: document.getElementById('rebindLeft'),
+            right: document.getElementById('rebindRight')
+        };
+
         function loadControls() {
             const savedControls = localStorage.getItem('cloneCampaignControls');
             if (savedControls) { controls = JSON.parse(savedControls); }
             for (const action in controls) { rebindButtons[action].textContent = controls[action]; }
         }
+
         function listenForKey(action) {
             if (currentRebind) return;
             currentRebind = action;
@@ -328,13 +315,13 @@
         document.getElementById('backButton').onclick = () => { characterMenu.style.display = 'none'; mainMenu.style.display = 'block'; };
         document.getElementById('backButtonSettings').onclick = () => { settingsMenu.style.display = 'none'; mainMenu.style.display = 'block'; };
         document.getElementById('backButtonAchievements').onclick = () => { achievementsMenu.style.display = 'none'; mainMenu.style.display = 'block'; };
-        
+
         document.getElementById('volumeSlider').addEventListener('input', (e) => {
-            volume = parseFloat(e.target.value); backgroundMusic.volume = volume;
+            volume = parseFloat(e.target.value);
+            backgroundMusic.volume = volume;
             document.getElementById('volumeValue').textContent = `${Math.round(volume * 100)}%`;
         });
 
-        // Lógica de compra y selección genérica (funciona para los 6)
         document.querySelectorAll('.character-option').forEach(opt => {
             opt.addEventListener('click', (e) => {
                 const type = e.currentTarget.getAttribute('data-type');
@@ -364,7 +351,7 @@
             const code = document.getElementById('adminCode').value;
             const status = document.getElementById('adminStatus');
             if (code === "1975") {
-                player.health = player.maxHealth; 
+                player.health = player.maxHealth;
                 status.textContent = "¡CÓDIGO ACEPTADO! Arsenal abierto...";
                 status.style.color = "#00FF00";
                 document.getElementById('adminCode').value = "";
@@ -376,16 +363,52 @@
                 status.style.color = "#FFD700";
                 document.getElementById('adminCode').value = "";
                 setTimeout(() => { status.textContent = ""; }, 2000);
-            } else { status.textContent = "Código incorrecto."; status.style.color = "#FF0000"; setTimeout(() => { status.textContent = ""; }, 4000); }
+            } else {
+                status.textContent = "Código incorrecto.";
+                status.style.color = "#FF0000";
+                setTimeout(() => { status.textContent = ""; }, 4000);
+            }
         }
 
-        function dieAndExit() { globalGold += droidsKilled; totalKillsStats += droidsKilled; localStorage.setItem('cloneCampaignTotalKills', totalKillsStats); updateGoldUI(); location.reload(); }
-        function triggerGameOver() { globalGold += droidsKilled; totalKillsStats += droidsKilled; localStorage.setItem('cloneCampaignTotalKills', totalKillsStats); updateGoldUI(); alert(`GAME OVER.\nHasta destruido a ${droidsKilled} droides.\n¡Ganaste ${droidsKilled} de Oro!`); location.reload(); }
+        let gameOverTriggered = false;  // AVISO #5: guard contra doble ejecución
 
-        // --- CLASES Y GRÁFICOS ---
+        // AVISO #4: helper para limpiar todos los timers activos de jefes antes de salir/morir.
+        function cleanupActiveBossTimers() {
+            droids.forEach(d => { if (typeof d.destroy === 'function') d.destroy(); });
+        }
+
+        function dieAndExit() {
+            if (gameOverTriggered) return;       // AVISO #5
+            gameOverTriggered = true;
+            cleanupActiveBossTimers();           // AVISO #4
+            if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+            globalGold += droidsKilled;
+            totalKillsStats += droidsKilled;
+            localStorage.setItem('cloneCampaignTotalKills', totalKillsStats);
+            updateGoldUI();
+            location.reload();
+        }
+
+        function triggerGameOver() {
+            if (gameOverTriggered) return;       // AVISO #5
+            gameOverTriggered = true;
+            cleanupActiveBossTimers();           // AVISO #4
+            if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+            globalGold += droidsKilled;
+            totalKillsStats += droidsKilled;
+            localStorage.setItem('cloneCampaignTotalKills', totalKillsStats);
+            updateGoldUI();
+            alert(`GAME OVER.\nHas destruido a ${droidsKilled} droides.\n¡Ganaste ${droidsKilled} de Oro!`);
+            location.reload();
+        }
+
+        // =============================================================
+        // CLASES Y GRÁFICOS
+        // =============================================================
         function drawCrosshair() {
             if (gamePaused) return;
-            ctx.save(); ctx.shadowColor = 'rgba(255, 0, 0, 0.7)'; ctx.shadowBlur = 8;
+            ctx.save();
+            ctx.shadowColor = 'rgba(255, 0, 0, 0.7)'; ctx.shadowBlur = 8;
             ctx.strokeStyle = '#FF0000'; ctx.lineWidth = 3;
             ctx.beginPath(); ctx.moveTo(mouse.x - 12, mouse.y); ctx.lineTo(mouse.x - 3, mouse.y); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(mouse.x + 3, mouse.y); ctx.lineTo(mouse.x + 12, mouse.y); ctx.stroke();
@@ -396,7 +419,7 @@
 
         class Player {
             constructor(x, y, type) {
-                this.x = x; this.y = y; this.width = 40; this.height = 60; 
+                this.x = x; this.y = y; this.width = 40; this.height = 60;
                 this.dx = 0; this.dy = 0; this.skills = []; this.canShoot = true;
                 this.type = type;
                 this.speed = 5; this.health = 100; this.maxHealth = 100;
@@ -405,129 +428,635 @@
                 this.xpMultiplier = 1.0; this.piercingShots = false; this.tripleShot = false;
                 this.hasRegen = false; this.hasMagnet = false; this.critChance = 0; this.critMultiplier = 2;
                 this.lifeSteal = false; this.evasionChance = 0; this.rearShot = false;
-                
-                // --- ESTADÍSTICAS INICIALES DE LOS 6 CLONES ---
-                if (this.type === '501') { this.health = 200; this.maxHealth = 200; this.fireRate = 350; } 
-                else if (this.type === '327') { this.health = 75; this.maxHealth = 75; this.speed = 6.25; this.fireRate = 300; this.piercingShots = true; this.skills.push('Disparo Penetrante'); }
-                else if (this.type === 'rex') { this.health = 300; this.maxHealth = 300; this.damage = 15; }
-                else if (this.type === 'arc') { this.health = 100; this.speed = 7.5; this.fireRate = 100; this.evasionChance = 0.20; this.skills.push('Evasión'); }
-                else if (this.type === 'commando') { 
-                    this.health = 400; this.maxHealth = 400; this.speed = 4; this.bulletSize = 10; 
-                    this.damage = 25; this.fireRate = 500; this.projectileSpeed = 5; this.piercingShots = true; 
+
+                if (this.type === '501') {
+                    this.health = 200; this.maxHealth = 200; this.fireRate = 350;
+                } else if (this.type === '327') {
+                    this.health = 75; this.maxHealth = 75; this.speed = 6.25;
+                    this.fireRate = 300; this.piercingShots = true; this.skills.push('Disparo Penetrante');
+                } else if (this.type === 'rex') {
+                    this.health = 300; this.maxHealth = 300; this.damage = 15;
+                } else if (this.type === 'arc') {
+                    // FIX CRÍTICO #3: ARC ahora inicializa maxHealth correctamente
+                    this.health = 100; this.maxHealth = 100;
+                    this.speed = 7.5; this.fireRate = 100;
+                    this.evasionChance = 0.20; this.skills.push('Evasión');
+                } else if (this.type === 'commando') {
+                    this.health = 400; this.maxHealth = 400; this.speed = 4;
+                    this.bulletSize = 10; this.damage = 25; this.fireRate = 500;
+                    this.projectileSpeed = 5; this.piercingShots = true;
                     this.skills.push('Balas Masivas'); this.skills.push('Disparo Penetrante');
-                    // El comando es visualmente más grande
                     this.width = 50; this.height = 70;
                 }
             }
+
             draw() {
                 ctx.strokeStyle = '#333333'; ctx.lineWidth = 2;
-                const headX = this.x + this.width / 2; const headY = this.y + 12;
+                const headX = this.x + this.width / 2;
+                const headY = this.y + 12;
                 const bodyY = this.y + (this.type === 'commando' ? 28 : 24);
 
-                // Cabeza
                 ctx.fillStyle = (this.type === 'arc' ? '#444' : '#E0E0E0');
-                ctx.beginPath(); ctx.arc(headX, headY, 12, Math.PI, 0); ctx.lineTo(headX + 12, headY + 8); ctx.lineTo(headX - 12, headY + 8); ctx.closePath(); ctx.fill(); ctx.stroke();
-                
-                // Marcas y detalles del casco
-                if (this.type === '501') { ctx.fillStyle = '#0066CC'; ctx.fillRect(headX - 3, headY - 12, 6, 26); } 
-                else if (this.type === '327') { ctx.fillStyle = '#FFD700'; ctx.fillRect(headX - 3, headY - 12, 6, 26); }
-                else if (this.type === 'rex') { 
-                    // Casco Rex (Azul y crestas)
+                ctx.beginPath(); ctx.arc(headX, headY, 12, Math.PI, 0);
+                ctx.lineTo(headX + 12, headY + 8); ctx.lineTo(headX - 12, headY + 8);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+
+                if (this.type === '501') {
                     ctx.fillStyle = '#0066CC'; ctx.fillRect(headX - 3, headY - 12, 6, 26);
-                    ctx.fillStyle = '#0066CC'; ctx.beginPath(); ctx.moveTo(headX - 10, headY - 5); ctx.lineTo(headX - 12, headY - 10); ctx.lineTo(headX - 8, headY - 10); ctx.fill();
+                } else if (this.type === '327') {
+                    ctx.fillStyle = '#FFD700'; ctx.fillRect(headX - 3, headY - 12, 6, 26);
+                } else if (this.type === 'rex') {
+                    ctx.fillStyle = '#0066CC'; ctx.fillRect(headX - 3, headY - 12, 6, 26);
+                    ctx.beginPath(); ctx.moveTo(headX - 10, headY - 5); ctx.lineTo(headX - 12, headY - 10); ctx.lineTo(headX - 8, headY - 10); ctx.fill();
                     ctx.beginPath(); ctx.moveTo(headX + 10, headY - 5); ctx.lineTo(headX + 12, headY - 10); ctx.lineTo(headX + 8, headY - 10); ctx.fill();
+                } else if (this.type === 'arc') {
+                    ctx.fillStyle = '#ff4444'; ctx.fillRect(headX - 3, headY - 12, 6, 20);
+                    ctx.fillStyle = '#444'; ctx.fillRect(headX - 8, headY - 15, 16, 5);
+                } else if (this.type === 'commando') {
+                    ctx.fillStyle = '#556B2F'; ctx.fillRect(headX - 3, headY - 12, 6, 26);
+                    ctx.fillStyle = '#E0E0E0'; ctx.fillRect(headX - 10, headY - 15, 20, 8);
                 }
-                else if (this.type === 'arc') { ctx.fillStyle = '#ff4444'; ctx.fillRect(headX - 3, headY - 12, 6, 20); ctx.fillStyle = '#444'; ctx.fillRect(headX - 8, headY - 15, 16, 5); }
-                else if (this.type === 'commando') { ctx.fillStyle = '#556B2F'; ctx.fillRect(headX - 3, headY - 12, 6, 26); ctx.fillStyle = '#E0E0E0'; ctx.fillRect(headX - 10, headY - 15, 20, 8); }
 
-                // Visor T
                 ctx.fillStyle = '#000000'; ctx.fillRect(headX - 10, headY - 8, 20, 4);
-                
-                // Cuerpo
-                ctx.fillStyle = (this.type === 'arc' ? '#444' : '#E0E0E0');
-                if (this.type === 'commando') { ctx.fillRect(this.x + 5, bodyY, 40, 38); ctx.strokeRect(this.x + 5, bodyY, 40, 38); }
-                else { ctx.fillRect(this.x + 10, bodyY, 20, 30); ctx.strokeRect(this.x + 10, bodyY, 20, 30); }
 
-                // Marcas del cuerpo y detalles
-                if (this.type === '501') { ctx.fillStyle = '#0066CC'; ctx.fillRect(this.x + 10, bodyY, 20, 8); } 
-                else if (this.type === '327') { ctx.fillStyle = '#FFD700'; ctx.fillRect(this.x + 10, bodyY + 5, 20, 8); ctx.fillStyle = '#FFD700'; ctx.fillRect(this.x + 5, bodyY, 5, 10); ctx.fillRect(this.x + 30, bodyY, 5, 10); }
-                else if (this.type === 'rex') { ctx.fillStyle = '#0066CC'; ctx.fillRect(this.x + 10, bodyY, 20, 15); ctx.fillStyle = '#333'; ctx.fillRect(this.x + 5, bodyY - 2, 8, 6); ctx.fillRect(this.x + 27, bodyY - 2, 8, 6); }
-                else if (this.type === 'arc') { ctx.fillStyle = '#ff4444'; ctx.fillRect(this.x + 15, bodyY, 10, 30); ctx.fillStyle = '#444'; ctx.fillRect(this.x + 5, bodyY - 2, 12, 8); ctx.fillRect(this.x + 23, bodyY - 2, 12, 8); }
-                else if (this.type === 'commando') { ctx.fillStyle = '#556B2F'; ctx.fillRect(this.x + 5, bodyY + 5, 40, 15); ctx.fillStyle = '#E0E0E0'; ctx.fillRect(this.x + 15, bodyY, 20, 5); }
+                ctx.fillStyle = (this.type === 'arc' ? '#444' : '#E0E0E0');
+                if (this.type === 'commando') {
+                    ctx.fillRect(this.x + 5, bodyY, 40, 38); ctx.strokeRect(this.x + 5, bodyY, 40, 38);
+                } else {
+                    ctx.fillRect(this.x + 10, bodyY, 20, 30); ctx.strokeRect(this.x + 10, bodyY, 20, 30);
+                }
+
+                if (this.type === '501') {
+                    ctx.fillStyle = '#0066CC'; ctx.fillRect(this.x + 10, bodyY, 20, 8);
+                } else if (this.type === '327') {
+                    ctx.fillStyle = '#FFD700'; ctx.fillRect(this.x + 10, bodyY + 5, 20, 8);
+                    ctx.fillRect(this.x + 5, bodyY, 5, 10); ctx.fillRect(this.x + 30, bodyY, 5, 10);
+                } else if (this.type === 'rex') {
+                    ctx.fillStyle = '#0066CC'; ctx.fillRect(this.x + 10, bodyY, 20, 15);
+                    ctx.fillStyle = '#333'; ctx.fillRect(this.x + 5, bodyY - 2, 8, 6); ctx.fillRect(this.x + 27, bodyY - 2, 8, 6);
+                } else if (this.type === 'arc') {
+                    ctx.fillStyle = '#ff4444'; ctx.fillRect(this.x + 15, bodyY, 10, 30);
+                    ctx.fillStyle = '#444'; ctx.fillRect(this.x + 5, bodyY - 2, 12, 8); ctx.fillRect(this.x + 23, bodyY - 2, 12, 8);
+                } else if (this.type === 'commando') {
+                    ctx.fillStyle = '#556B2F'; ctx.fillRect(this.x + 5, bodyY + 5, 40, 15);
+                    ctx.fillStyle = '#E0E0E0'; ctx.fillRect(this.x + 15, bodyY, 20, 5);
+                }
             }
+
             update() {
                 this.x += this.dx; this.y += this.dy;
-                if (this.x < 0) this.x = 0; if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
-                if (this.y < 0) this.y = 0; if (this.y + this.height > canvas.height) this.y = canvas.height - this.height;
+                if (this.x < 0) this.x = 0;
+                if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+                if (this.y < 0) this.y = 0;
+                if (this.y + this.height > canvas.height) this.y = canvas.height - this.height;
                 this.draw();
             }
+
             shoot(targetX, targetY) {
                 if (!this.canShoot || gamePaused) return;
-                const shootOriginX = this.x + this.width / 2, shootOriginY = this.y + this.height / 2; 
+                const shootOriginX = this.x + this.width / 2;
+                const shootOriginY = this.y + this.height / 2;
                 const mainAngle = Math.atan2(targetY - shootOriginY, targetX - shootOriginX);
-                
-                // Color y tamaño base del proyectil
+
                 let bSize = this.bulletSize;
                 let bColor = '#00FFFF';
-
                 if (this.type === 'commando') { bColor = '#fff'; }
                 else if (this.tripleShot) { bColor = '#fff'; }
                 else if (this.piercingShots) { bColor = '#fff'; }
 
+                // FIX CRÍTICO #2: se pasa this.damage al constructor de Projectile
                 if (this.tripleShot) {
                     const spread = Math.PI / 12;
-                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, bColor, bSize));
-                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle - spread) * this.projectileSpeed, y: Math.sin(mainAngle - spread) * this.projectileSpeed }, bColor, bSize));
-                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle + spread) * this.projectileSpeed, y: Math.sin(mainAngle + spread) * this.projectileSpeed }, bColor, bSize));
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, bColor, bSize, this.damage));
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle - spread) * this.projectileSpeed, y: Math.sin(mainAngle - spread) * this.projectileSpeed }, bColor, bSize, this.damage));
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle + spread) * this.projectileSpeed, y: Math.sin(mainAngle + spread) * this.projectileSpeed }, bColor, bSize, this.damage));
                 } else {
-                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, bColor, bSize));
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, bColor, bSize, this.damage));
                 }
-                if (this.rearShot) { projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle + Math.PI) * this.projectileSpeed, y: Math.sin(mainAngle + Math.PI) * this.projectileSpeed }, bColor, bSize)); }
-                this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate);
+                if (this.rearShot) {
+                    projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle + Math.PI) * this.projectileSpeed, y: Math.sin(mainAngle + Math.PI) * this.projectileSpeed }, bColor, bSize, this.damage));
+                }
+                this.canShoot = false;
+                setTimeout(() => { this.canShoot = true; }, this.fireRate);
             }
         }
 
         class Projectile {
-            constructor(x, y, velocity, color, radius, damage) { this.x = x; this.y = y; this.velocity = velocity; this.color = color; this.radius = radius; this.damage = damage; }
-            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
+            constructor(x, y, velocity, color, radius, damage) {
+                this.x = x; this.y = y; this.velocity = velocity;
+                this.color = color; this.radius = radius; this.damage = damage;
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color; ctx.fill();
+            }
             update() { this.x += this.velocity.x; this.y += this.velocity.y; this.draw(); }
         }
 
         class Droid {
-            constructor(x, y) { this.x = x; this.y = y; this.width = 30; this.height = 50; this.health = 30; this.maxHealth = 30; this.speed = 1; this.expValue = 25; this.fireRate = 5000; this.canShoot = true; this.projectileSpeed = 4; this.hitboxRadius = this.width / 2; this.isBoss = false; this.countsAsKill = true; }
-            drawHealthBar() { ctx.fillStyle = '#333'; ctx.fillRect(this.x, this.y - 15, this.width, 4); ctx.fillStyle = '#FF0000'; ctx.fillRect(this.x, this.y - 15, this.width * (this.health / this.maxHealth), 4); }
-            draw() { ctx.fillStyle = '#C2B280'; ctx.strokeStyle = '#5C4033'; ctx.lineWidth = 1.5; ctx.fillRect(this.x + 9, this.y - 10, 12, 20); ctx.strokeRect(this.x + 9, this.y - 10, 12, 20); ctx.fillRect(this.x, this.y + 10, this.width, 25); ctx.strokeRect(this.x, this.y + 10, this.width, 25); }
-            shoot(player) { if (!this.canShoot || gamePaused) return; const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2)); enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 6, 15)); this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate); }
-            update(player) { const angle = Math.atan2((player.y + player.height/2) - (this.y + this.height/2), (player.x + player.width/2) - (this.x + this.width/2)); this.x += Math.cos(angle) * this.speed; this.y += Math.sin(angle) * this.speed; this.shoot(player); this.draw(); if (!this.isBoss) this.drawHealthBar(); }
+            constructor(x, y) {
+                this.x = x; this.y = y; this.width = 30; this.height = 50;
+                this.health = 30; this.maxHealth = 30; this.speed = 1;
+                this.expValue = 25; this.fireRate = 5000; this.canShoot = true;
+                this.projectileSpeed = 4; this.hitboxRadius = this.width / 2;
+                this.isBoss = false; this.countsAsKill = true;
+            }
+            drawHealthBar() {
+                ctx.fillStyle = '#333'; ctx.fillRect(this.x, this.y - 15, this.width, 4);
+                ctx.fillStyle = '#FF0000'; ctx.fillRect(this.x, this.y - 15, this.width * (this.health / this.maxHealth), 4);
+            }
+            draw() {
+                ctx.fillStyle = '#C2B280'; ctx.strokeStyle = '#5C4033'; ctx.lineWidth = 1.5;
+                ctx.fillRect(this.x + 9, this.y - 10, 12, 20); ctx.strokeRect(this.x + 9, this.y - 10, 12, 20);
+                ctx.fillRect(this.x, this.y + 10, this.width, 25); ctx.strokeRect(this.x, this.y + 10, this.width, 25);
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused) return;
+                const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 6, 15));
+                this.canShoot = false;
+                setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+            update(player) {
+                const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
+                this.x += Math.cos(angle) * this.speed;
+                this.y += Math.sin(angle) * this.speed;
+                this.shoot(player);
+                this.draw();
+                if (!this.isBoss) this.drawHealthBar();
+            }
         }
 
-        class SuperDroid extends Droid { constructor(x, y) { super(x, y); this.health = 70; this.maxHealth = 70; this.expValue = 50; this.color = '#505050'; this.fireRate = 4000; this.projectileSpeed = 5; this.hitboxRadius = this.width / 2 + 5; } draw() { ctx.fillStyle = this.color; ctx.strokeStyle = '#303030'; ctx.lineWidth = 2; ctx.fillRect(this.x + 6, this.y - 12, 18, 25); ctx.strokeRect(this.x + 6, this.y - 12, 18, 25); ctx.fillRect(this.x - 5, this.y + 10, this.width + 10, 35); ctx.strokeRect(this.x - 5, this.y + 10, this.width + 10, 35); } shoot(player) { if (!this.canShoot || gamePaused) return; const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2)); const spreadAngle = Math.PI / 18; enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle - spreadAngle) * this.projectileSpeed, y: Math.sin(angle - spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20)); enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle + spreadAngle) * this.projectileSpeed, y: Math.sin(angle + spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20)); this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate); } }
-        class DroidGenerator { constructor(x, y) { this.x = x; this.y = y; this.width = 100; this.height = 80; this.health = 4000; this.maxHealth = 4000; this.isBoss = true; this.hitboxRadius = 50; this.expValue = 200; this.spawnTimer = setInterval(() => { if (!gamePaused && isEventActive) { let d1 = new Droid(this.x + 10, this.y + this.height); let d2 = new Droid(this.x + this.width - 40, this.y + this.height); let d3 = new SuperDroid(this.x + this.width / 2 - 15, this.y + this.height + 20); d1.countsAsKill = false; d2.countsAsKill = false; d3.countsAsKill = false; droids.push(d1, d2, d3); } }, 5000); } draw() { ctx.fillStyle = '#444'; ctx.strokeStyle = '#888'; ctx.lineWidth = 4; ctx.fillRect(this.x, this.y, this.width, this.height); ctx.strokeRect(this.x, this.y, this.width, this.height); ctx.fillStyle = (Math.random() < 0.1) ? 'yellow' : 'red'; ctx.beginPath(); ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 10, 0, Math.PI * 2); ctx.fill(); } update(player){ this.draw(); } destroy() { clearInterval(this.spawnTimer); } }
-        class SpiderDroid extends Droid { constructor(x, y) { super(x, y); this.width = 80; this.height = 80; this.health = 2700; this.maxHealth = 2700; this.expValue = 100; this.speed = 0.5; this.fireRate = 3000; this.projectileSpeed = 9; this.hitboxRadius = 40; this.isBoss = true; } draw() { const cX = this.x + this.width / 2, cY = this.y + this.height / 2; ctx.strokeStyle = '#8B0000'; ctx.lineWidth = 4; for (let i = 0; i < 4; i++) { const angle = (Math.PI / 4) * i + Math.PI / 8; ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(cX + Math.cos(angle)*60, cY + Math.sin(angle)*60); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(cX - Math.cos(angle)*60, cY - Math.sin(angle)*60); ctx.stroke(); } ctx.fillStyle = '#A9A9A9'; ctx.strokeStyle = '#696969'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cX, cY, this.hitboxRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#FF0000'; ctx.beginPath(); ctx.arc(cX, cY, 8, 0, Math.PI * 2); ctx.fill(); } shoot(player) { if (!this.canShoot || gamePaused) return; const cX = this.x + this.width / 2, cY = this.y + this.height / 2; const mainAngle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX); const spread = Math.PI / 18, damage = 30; enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, '#FF4500', 8, damage)); enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle - spread) * this.projectileSpeed, y: Math.sin(mainAngle - spread) * this.projectileSpeed }, '#FF4500', 8, damage)); enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle + spread) * this.projectileSpeed, y: Math.sin(mainAngle + spread) * this.projectileSpeed }, '#FF4500', 8, damage)); this.canShoot = false; setTimeout(() => { this.canShoot = true; }, this.fireRate); } }
-        class Droideka extends Droid { constructor(x, y) { super(x, y); this.width = 60; this.height = 60; this.health = 6000; this.maxHealth = 6000; this.expValue = 250; this.speed = 3; this.projectileSpeed = 8; this.hitboxRadius = 40; this.isBoss = true; this.mode = 'roll'; this.modeTimer = 0; this.shootFrame = 0; } draw() { const cX = this.x + this.width / 2, cY = this.y + this.height / 2; ctx.lineWidth = 3; if (this.mode === 'roll') { ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033'; ctx.beginPath(); ctx.arc(cX, cY, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(cX, cY, 15, 0, Math.PI * 2); ctx.stroke(); } else { ctx.fillStyle = 'rgba(0, 100, 255, 0.2)'; ctx.strokeStyle = '#00FFFF'; ctx.beginPath(); ctx.arc(cX, cY, 40, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033'; ctx.beginPath(); ctx.arc(cX, cY, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#333'; ctx.fillRect(cX - 30, cY - 5, 20, 10); ctx.fillRect(cX + 10, cY - 5, 20, 10); } } shoot(player) { const cX = this.x + this.width / 2, cY = this.y + this.height / 2; const angle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX); enemyProjectiles.push(new Projectile(shootX, shootY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 12, 12)); } update(player) { this.modeTimer++; if (this.modeTimer > 120) { this.mode = this.mode === 'roll' ? 'shoot' : 'roll'; this.modeTimer = 0; this.shootFrame = 0; } if (this.mode === 'roll') { const angle = Math.atan2((player.y + player.height/2) - (this.y + this.height/2), (player.x + player.width/2) - (this.x + this.width/2)); this.x += Math.cos(angle) * this.speed; this.y += Math.sin(angle) * this.speed; } else { this.shootFrame++; if (this.shootFrame >= 4) { this.shoot(player); this.shootFrame = 0; } } this.draw(); } }
-        class ExperienceOrb { constructor(x, y, value) { this.x = x; this.y = y; this.value = value; this.radius = 5; this.speed = 3; } draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = '#FFFF00'; ctx.fill(); } update(player) { let speed = this.speed; const dist = Math.hypot(player.x + player.width / 2 - this.x, player.y + player.height / 2 - this.y); if (player.hasMagnet && dist < 150) { speed *= 3; } const angle = Math.atan2(player.y + player.height / 2 - this.y, player.x + player.width / 2 - this.x); this.x += Math.cos(angle) * speed; this.y += Math.sin(angle) * speed; this.draw(); } }
-        class Particle { constructor(x, y, velocity, color) { this.x = x; this.y = y; this.velocity = velocity; this.color = color; this.radius = Math.random() * 3 + 1; this.alpha = 1; } draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); ctx.restore(); } update() { this.x += this.velocity.x; this.y += this.velocity.y; this.alpha -= 0.01; this.draw(); } }
+        class SuperDroid extends Droid {
+            constructor(x, y) {
+                super(x, y);
+                this.health = 70; this.maxHealth = 70; this.expValue = 50;
+                this.color = '#505050'; this.fireRate = 4000; this.projectileSpeed = 5;
+                this.hitboxRadius = this.width / 2 + 5;
+            }
+            draw() {
+                ctx.fillStyle = this.color; ctx.strokeStyle = '#303030'; ctx.lineWidth = 2;
+                ctx.fillRect(this.x + 6, this.y - 12, 18, 25); ctx.strokeRect(this.x + 6, this.y - 12, 18, 25);
+                ctx.fillRect(this.x - 5, this.y + 10, this.width + 10, 35); ctx.strokeRect(this.x - 5, this.y + 10, this.width + 10, 35);
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused) return;
+                const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
+                const spreadAngle = Math.PI / 18;
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle - spreadAngle) * this.projectileSpeed, y: Math.sin(angle - spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle + spreadAngle) * this.projectileSpeed, y: Math.sin(angle + spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20));
+                this.canShoot = false;
+                setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+        }
+
+        class DroidGenerator {
+            constructor(x, y) {
+                this.x = x; this.y = y; this.width = 100; this.height = 80;
+                this.health = 4000; this.maxHealth = 4000; this.isBoss = true;
+                this.hitboxRadius = 50; this.expValue = 200;
+                this.spawnTimer = setInterval(() => {
+                    if (!gamePaused && isEventActive) {
+                        let d1 = new Droid(this.x + 10, this.y + this.height);
+                        let d2 = new Droid(this.x + this.width - 40, this.y + this.height);
+                        let d3 = new SuperDroid(this.x + this.width / 2 - 15, this.y + this.height + 20);
+                        d1.countsAsKill = false; d2.countsAsKill = false; d3.countsAsKill = false;
+                        droids.push(d1, d2, d3);
+                    }
+                }, 5000);
+            }
+            draw() {
+                ctx.fillStyle = '#444'; ctx.strokeStyle = '#888'; ctx.lineWidth = 4;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+                ctx.fillStyle = (Math.random() < 0.1) ? 'yellow' : 'red';
+                ctx.beginPath(); ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 10, 0, Math.PI * 2); ctx.fill();
+            }
+            update(player) { this.draw(); }
+            destroy() { clearInterval(this.spawnTimer); }
+        }
+
+        class SpiderDroid extends Droid {
+            constructor(x, y) {
+                super(x, y);
+                this.width = 80; this.height = 80; this.health = 2700; this.maxHealth = 2700;
+                this.expValue = 100; this.speed = 0.5; this.fireRate = 3000;
+                this.projectileSpeed = 9; this.hitboxRadius = 40; this.isBoss = true;
+            }
+            draw() {
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                ctx.strokeStyle = '#8B0000'; ctx.lineWidth = 4;
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI / 4) * i + Math.PI / 8;
+                    ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(cX + Math.cos(angle) * 60, cY + Math.sin(angle) * 60); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(cX - Math.cos(angle) * 60, cY - Math.sin(angle) * 60); ctx.stroke();
+                }
+                ctx.fillStyle = '#A9A9A9'; ctx.strokeStyle = '#696969'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cX, cY, this.hitboxRadius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#FF0000'; ctx.beginPath(); ctx.arc(cX, cY, 8, 0, Math.PI * 2); ctx.fill();
+            }
+            shoot(player) {
+                if (!this.canShoot || gamePaused) return;
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                const mainAngle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
+                const spread = Math.PI / 18, damage = 30;
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, '#FF4500', 8, damage));
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle - spread) * this.projectileSpeed, y: Math.sin(mainAngle - spread) * this.projectileSpeed }, '#FF4500', 8, damage));
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(mainAngle + spread) * this.projectileSpeed, y: Math.sin(mainAngle + spread) * this.projectileSpeed }, '#FF4500', 8, damage));
+                this.canShoot = false;
+                setTimeout(() => { this.canShoot = true; }, this.fireRate);
+            }
+        }
+
+        class Droideka extends Droid {
+            constructor(x, y) {
+                super(x, y);
+                this.width = 60; this.height = 60; this.health = 6000; this.maxHealth = 6000;
+                this.expValue = 250; this.speed = 3; this.projectileSpeed = 8;
+                this.hitboxRadius = 40; this.isBoss = true;
+                this.mode = 'roll'; this.modeTimer = 0; this.shootFrame = 0;
+            }
+            draw() {
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                ctx.lineWidth = 3;
+                if (this.mode === 'roll') {
+                    ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033';
+                    ctx.beginPath(); ctx.arc(cX, cY, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(cX, cY, 15, 0, Math.PI * 2); ctx.stroke();
+                } else {
+                    ctx.fillStyle = 'rgba(0, 100, 255, 0.2)'; ctx.strokeStyle = '#00FFFF';
+                    ctx.beginPath(); ctx.arc(cX, cY, 40, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#B87333'; ctx.strokeStyle = '#5C4033';
+                    ctx.beginPath(); ctx.arc(cX, cY, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(cX - 30, cY - 5, 20, 10); ctx.fillRect(cX + 10, cY - 5, 20, 10);
+                }
+            }
+            shoot(player) {
+                // FIX CRÍTICO #1: usamos cX/cY correctamente en lugar de shootX/shootY inexistentes
+                const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
+                const angle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
+                enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 12, 12));
+            }
+            update(player) {
+                this.modeTimer++;
+                if (this.modeTimer > 120) {
+                    this.mode = this.mode === 'roll' ? 'shoot' : 'roll';
+                    this.modeTimer = 0;
+                    this.shootFrame = 0;
+                }
+                if (this.mode === 'roll') {
+                    const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
+                    this.x += Math.cos(angle) * this.speed;
+                    this.y += Math.sin(angle) * this.speed;
+                } else {
+                    this.shootFrame++;
+                    if (this.shootFrame >= 4) { this.shoot(player); this.shootFrame = 0; }
+                }
+                this.draw();
+                // AVISO #1: drawHealthBar ahora se llama en Droideka igual que en los demás droides.
+                this.drawHealthBar();
+            }
+        }
+
+        class ExperienceOrb {
+            constructor(x, y, value) { this.x = x; this.y = y; this.value = value; this.radius = 5; this.speed = 3; }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#FFFF00'; ctx.fill();
+            }
+            update(player) {
+                let speed = this.speed;
+                const dist = Math.hypot(player.x + player.width / 2 - this.x, player.y + player.height / 2 - this.y);
+                if (player.hasMagnet && dist < 150) { speed *= 3; }
+                const angle = Math.atan2(player.y + player.height / 2 - this.y, player.x + player.width / 2 - this.x);
+                this.x += Math.cos(angle) * speed;
+                this.y += Math.sin(angle) * speed;
+                this.draw();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, velocity, color) {
+                this.x = x; this.y = y; this.velocity = velocity; this.color = color;
+                this.radius = Math.random() * 3 + 1; this.alpha = 1;
+            }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.alpha;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color; ctx.fill(); ctx.restore();
+            }
+            update() { this.x += this.velocity.x; this.y += this.velocity.y; this.alpha -= 0.01; this.draw(); }
+        }
 
         let projectiles = [], enemyProjectiles = [], droids = [], experienceOrbs = [], particles = [];
         let experience = 0, level = 1, experienceNeeded = 100, spawnInterval = 2000;
         const keys = { up: false, down: false, left: false, right: false };
 
-        function togglePause() { if (gameContainer.style.display !== 'flex' || skillModal.style.display === 'block') return; gamePaused = !gamePaused; if (gamePaused) { backgroundMusic.pause(); canvas.style.cursor = 'default'; pauseOverlay.style.display = 'flex'; } else { backgroundMusic.play(); canvas.style.cursor = 'none'; pauseOverlay.style.display = 'none'; animate(); } }
-        window.addEventListener('keydown', (e) => { const pk = e.key.toLowerCase(); if (currentRebind) { if (e.key !== 'Escape') { controls[currentRebind] = pk; localStorage.setItem('cloneCampaignControls', JSON.stringify(controls)); } for (const action in controls) { rebindButtons[action].textContent = controls[action]; } rebindButtons[currentRebind].classList.remove('waiting'); currentRebind = null; return; } if (pk === controls.left) keys.left = true; if (pk === controls.right) keys.right = true; if (pk === controls.up) keys.up = true; if (pk === controls.down) keys.down = true; if (e.key === 'Escape') togglePause(); });
-        window.addEventListener('keyup', (e) => { const rk = e.key.toLowerCase(); if (rk === controls.left) keys.left = false; if (rk === controls.right) keys.right = false; if (rk === controls.up) keys.up = false; if (rk === controls.down) keys.down = false; });
-        canvas.addEventListener('mousemove', (e) => { const rect = canvas.getBoundingClientRect(); mouse.x = e.clientX - rect.left; mouse.y = e.clientY - rect.top; });
+        function togglePause() {
+            if (gameContainer.style.display !== 'flex' || skillModal.style.display === 'block') return;
+            gamePaused = !gamePaused;
+            if (gamePaused) {
+                backgroundMusic.pause();
+                canvas.style.cursor = 'default';
+                pauseOverlay.style.display = 'flex';
+            } else {
+                backgroundMusic.play();
+                canvas.style.cursor = 'none';
+                pauseOverlay.style.display = 'none';
+                // FIX CRÍTICO #5: cancelar bucle anterior antes de crear uno nuevo
+                if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+                animate();
+            }
+        }
 
-        function spawnDroids() { clearInterval(spawnIntervalID); spawnIntervalID = setInterval(() => { if (gamePaused || isEventActive) return; const side = Math.floor(Math.random() * 4); let x, y; if (side === 0) { x = Math.random() * canvas.width; y = -50; } else if (side === 1) { x = canvas.width + 50; y = Math.random() * canvas.height; } else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 50; } else { x = -50; y = Math.random() * canvas.height; } if (Math.random() < 0.20) droids.push(new SuperDroid(x, y)); else droids.push(new Droid(x, y)); }, spawnInterval); }
-        function startEvent(type) { isEventActive = true; clearInterval(spawnIntervalID); enemyProjectiles.length = 0; droids.length = 0; if (type === 'spider') { droids.push(new SpiderDroid(canvas.width / 2 - 40, 100)); bossName.textContent = 'DROIDE ARAÑA'; } else if (type === 'generator') { droids.push(new DroidGenerator(canvas.width / 2 - 50, 50)); bossName.textContent = 'GENERADOR DE DROIDES'; } else if (type === 'droideka') { droids.push(new Droideka(canvas.width / 2 - 30, 100)); bossName.textContent = 'DROIDEKA DESTRUCTOR'; } bossHealthContainer.style.display = 'block'; }
+        window.addEventListener('keydown', (e) => {
+            const pk = e.key.toLowerCase();
+            if (currentRebind) {
+                if (e.key !== 'Escape') {
+                    controls[currentRebind] = pk;
+                    localStorage.setItem('cloneCampaignControls', JSON.stringify(controls));
+                }
+                for (const action in controls) { rebindButtons[action].textContent = controls[action]; }
+                rebindButtons[currentRebind].classList.remove('waiting');
+                currentRebind = null;
+                return;
+            }
+            if (pk === controls.left) keys.left = true;
+            if (pk === controls.right) keys.right = true;
+            if (pk === controls.up) keys.up = true;
+            if (pk === controls.down) keys.down = true;
+            if (e.key === 'Escape') togglePause();
+        });
+        window.addEventListener('keyup', (e) => {
+            const rk = e.key.toLowerCase();
+            if (rk === controls.left) keys.left = false;
+            if (rk === controls.right) keys.right = false;
+            if (rk === controls.up) keys.up = false;
+            if (rk === controls.down) keys.down = false;
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+
+        function spawnDroids() {
+            clearInterval(spawnIntervalID);
+            spawnIntervalID = setInterval(() => {
+                if (gamePaused || isEventActive) return;
+                const side = Math.floor(Math.random() * 4);
+                let x, y;
+                if (side === 0) { x = Math.random() * canvas.width; y = -50; }
+                else if (side === 1) { x = canvas.width + 50; y = Math.random() * canvas.height; }
+                else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 50; }
+                else { x = -50; y = Math.random() * canvas.height; }
+                if (Math.random() < 0.20) droids.push(new SuperDroid(x, y));
+                else droids.push(new Droid(x, y));
+            }, spawnInterval);
+        }
+
+        function startEvent(type) {
+            isEventActive = true;
+            clearInterval(spawnIntervalID);
+            enemyProjectiles.length = 0;
+            droids.length = 0;
+            if (type === 'spider') { droids.push(new SpiderDroid(canvas.width / 2 - 40, 100)); bossName.textContent = 'DROIDE ARAÑA'; }
+            else if (type === 'generator') { droids.push(new DroidGenerator(canvas.width / 2 - 50, 50)); bossName.textContent = 'GENERADOR DE DROIDES'; }
+            else if (type === 'droideka') { droids.push(new Droideka(canvas.width / 2 - 30, 100)); bossName.textContent = 'DROIDEKA DESTRUCTOR'; }
+            bossHealthContainer.style.display = 'block';
+        }
 
         const allSkills = [
-            { name: 'Fuego Rápido', description: 'Aumenta cadencia.', apply: () => player.fireRate *= 0.75 }, { name: 'Disparo Penetrante', description: 'Atraviesa enemigos.', apply: () => player.piercingShots = true }, { name: 'Velocidad', description: 'Aumenta movimiento.', apply: () => player.speed *= 1.2 }, { name: 'Blindaje Extra', description: 'Aumenta salud base.', apply: () => { player.health += 25; player.maxHealth += 25; } }, { name: 'Potencia', description: 'Aumenta daño.', apply: () => player.damage *= 1.5 }, { name: 'XP Boost', description: '+50% exp.', apply: () => player.xpMultiplier += 0.5 }, { name: 'Disparo Triple', description: 'Dispara tres láseres.', apply: () => player.tripleShot = true }, { name: 'Regeneración', description: 'Recupera vida pasivamente.', apply: () => player.hasRegen = true }, { name: 'Imán', description: 'Atrae orbes de exp.', apply: () => player.hasMagnet = true }, { name: 'Críticos', description: 'Probabilidad de doble daño.', apply: () => player.critChance += 0.10 }, { name: 'Sifón de Vida', description: 'Curas por baja.', apply: () => player.lifeSteal = true }, { name: 'Evasión', description: '20% prob. esquivar.', apply: () => player.evasionChance += 0.20 }, { name: 'Balas Masivas', description: 'Láseres más grandes.', apply: () => { player.bulletSize *= 2; player.damage *= 1.2; } }, { name: 'Velocidad Láser', description: 'Láser viaja rápido.', apply: () => player.projectileSpeed *= 1.5 }, { name: 'Disparo Trasero', description: 'Dispara en dirección opuesta.', apply: () => player.rearShot = true }, { name: 'Titán', description: '+150 Vida Máxima.', apply: () => { player.maxHealth += 150; player.health += 150; } }
+            { name: 'Fuego Rápido', description: 'Aumenta cadencia.', apply: () => player.fireRate *= 0.75 },
+            { name: 'Disparo Penetrante', description: 'Atraviesa enemigos.', apply: () => player.piercingShots = true },
+            { name: 'Velocidad', description: 'Aumenta movimiento.', apply: () => player.speed *= 1.2 },
+            { name: 'Blindaje Extra', description: 'Aumenta salud base.', apply: () => { player.health += 25; player.maxHealth += 25; } },
+            { name: 'Potencia', description: 'Aumenta daño.', apply: () => player.damage *= 1.5 },
+            { name: 'XP Boost', description: '+50% exp.', apply: () => player.xpMultiplier += 0.5 },
+            { name: 'Disparo Triple', description: 'Dispara tres láseres.', apply: () => player.tripleShot = true },
+            { name: 'Regeneración', description: 'Recupera vida pasivamente.', apply: () => player.hasRegen = true },
+            { name: 'Imán', description: 'Atrae orbes de exp.', apply: () => player.hasMagnet = true },
+            { name: 'Críticos', description: 'Probabilidad de doble daño.', apply: () => player.critChance += 0.10 },
+            { name: 'Sifón de Vida', description: 'Curas por baja.', apply: () => player.lifeSteal = true },
+            { name: 'Evasión', description: '20% prob. esquivar (máx. 75%).', apply: () => { player.evasionChance = Math.min(0.75, player.evasionChance + 0.20); } },
+            { name: 'Balas Masivas', description: 'Láseres más grandes.', apply: () => { player.bulletSize *= 2; player.damage *= 1.2; } },
+            { name: 'Velocidad Láser', description: 'Láser viaja rápido.', apply: () => player.projectileSpeed *= 1.5 },
+            { name: 'Disparo Trasero', description: 'Dispara en dirección opuesta.', apply: () => player.rearShot = true },
+            { name: 'Titán', description: '+150 Vida Máxima.', apply: () => { player.maxHealth += 150; player.health += 150; } }
         ];
 
-        function levelUp(isAdmin = false) { gamePaused = true; canvas.style.cursor = 'default'; skillModal.style.display = 'block'; skillOptionsContainer.innerHTML = ''; const modalTitle = document.querySelector('#skillModal h2'); const modalDesc = document.querySelector('#skillModal p'); const availableSkills = allSkills.filter(s => !player.skills.includes(s.name)); let options = []; if (isAdmin) { modalTitle.textContent = "ADMIN MENU"; modalTitle.style.color = "#00FF00"; modalDesc.textContent = "Elige cualquier habilidad:"; options = availableSkills; if (options.length === 0) { skillOptionsContainer.innerHTML = '<p>¡Ya tienes todo!</p>'; setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }, 2000); return; } } else { modalTitle.textContent = "¡NIVEL SUBIDO!"; modalTitle.style.color = "#FFFF00"; modalDesc.textContent = "Mejora táctica:"; while(options.length < 3 && availableSkills.length > 0) { options.push(availableSkills.splice(Math.floor(Math.random() * availableSkills.length), 1)[0]); } } options.forEach(skill => { const btn = document.createElement('button'); btn.innerHTML = `<span>${skill.name}</span><br><span style="font-size:0.8em; font-weight:normal;">${skill.description}</span>`; btn.onclick = () => { skill.apply(); player.skills.push(skill.name); if (!isAdmin) { level++; experience -= experienceNeeded; experienceNeeded = Math.floor(experienceNeeded * 1.5); } skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }; skillOptionsContainer.appendChild(btn); }); }
-        function updateUI() { healthUI.textContent = `Salud: ${Math.ceil(player.health)} / ${player.maxHealth}`; experienceUI.textContent = `Exp: ${Math.floor(experience)} / ${experienceNeeded}`; killCounterUI.textContent = `Bajas (Oro): ${droidsKilled}`; if (isEventActive) { const boss = droids.find(d => d.isBoss); if (boss) bossHealthFill.style.width = (boss.health / boss.maxHealth * 100) + '%'; } }
-        function animate() { if (gamePaused) return; requestAnimationFrame(animate); ctx.clearRect(0, 0, canvas.width, canvas.height); if (player.hasRegen && player.health < player.maxHealth) player.health += 0.02; player.dx = 0; player.dy = 0; if (keys.left) player.dx = -player.speed; if (keys.right) player.dx = player.speed; if (keys.up) player.dy = -player.speed; if (keys.down) player.dy = player.speed; player.update(); player.shoot(mouse.x, mouse.y); particles.forEach((p, i) => { if(p.alpha <= 0) particles.splice(i, 1); else p.update(); }); for (let i = projectiles.length - 1; i >= 0; i--) { const proj = projectiles[i]; proj.update(); if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { projectiles.splice(i, 1); continue; } let hitDroidInLoop = false; for (let j = droids.length - 1; j >= 0; j--) { const droid = droids[j]; let hitDetected = false; let dcX = droid.x + droid.width / 2, dcY = droid.y + droid.height / 2; if (droid instanceof DroidGenerator) { if (proj.x > droid.x && proj.x < droid.x + droid.width && proj.y > droid.y && proj.y < droid.y + droid.height) hitDetected = true; } else if (droid instanceof SpiderDroid || droid instanceof Droideka) { if (Math.hypot(proj.x - dcX, proj.y - dcY) - droid.hitboxRadius - proj.radius < 1) hitDetected = true; } else { dcY += 10; if (Math.hypot(proj.x - dcX, proj.y - dcY) - droid.hitboxRadius - proj.radius < 1) hitDetected = true; } if (hitDetected) { hitDroidInLoop = true; let hitDamage = player.damage; if (Math.random() < player.critChance) { hitDamage *= player.critMultiplier; for(let k=0; k<5; k++) particles.push(new Particle(proj.x, proj.y, {x:(Math.random()-0.5)*4, y:(Math.random()-0.5)*4}, '#FFFF00')); } droid.health -= hitDamage; if(!player.piercingShots) { projectiles.splice(i, 1); break; } } } if (hitDroidInLoop && !player.piercingShots) continue; } let needsEventCheck = false; for (let i = droids.length - 1; i >= 0; i--) { const droid = droids[i]; if (droid.health <= 0) { if(!droid.isBoss && droid.countsAsKill) { droidsKilled++; needsEventCheck = true; if (player.lifeSteal) player.health = Math.min(player.maxHealth, player.health + 2); } for(let k=0; k < (droid.isBoss ? 50:10); k++) particles.push(new Particle(droid.x + droid.width/2, droid.y + droid.height/2, {x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 5}, '#C2B280')); experienceOrbs.push(new ExperienceOrb(droid.x + droid.width / 2, droid.y + droid.height / 2, droid.expValue)); if(droid.isBoss) { if(typeof droid.destroy === 'function') droid.destroy(); isEventActive = false; bossHealthContainer.style.display = 'none'; spawnDroids(); totalBossesStats++; localStorage.setItem('cloneCampaignTotalBosses', totalBossesStats); } droids.splice(i, 1); } } if (needsEventCheck && !isEventActive) { if (droidsKilled > 0) { if (droidsKilled % 60 === 0) eventToTrigger = 'droideka'; else if (droidsKilled % 60 === 40) eventToTrigger = 'generator'; else if (droidsKilled % 60 === 20) eventToTrigger = 'spider'; } } if (eventToTrigger) { startEvent(eventToTrigger); eventToTrigger = null; } for (let i = enemyProjectiles.length - 1; i >= 0; i--) { const proj = enemyProjectiles[i]; proj.update(); if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { enemyProjectiles.splice(i, 1); continue; } if (Math.hypot(proj.x - (player.x + player.width / 2), proj.y - (player.y + player.height / 2)) - (player.width / 2 * 0.8) - proj.radius < 1) { if (Math.random() >= player.evasionChance) { player.health -= proj.damage; } else { for(let k=0; k<3; k++) particles.push(new Particle(player.x+player.width/2, player.y+player.height/2, {x:(Math.random()-0.5)*3, y:(Math.random()-0.5)*3}, '#00FFFF')); } enemyProjectiles.splice(i, 1); if (player.health <= 0) { player.health = 0; updateUI(); gamePaused = true; setTimeout(triggerGameOver, 100); } } } experienceOrbs.forEach((orb, index) => { orb.update(player); if (Math.hypot(player.x + player.width / 2 - orb.x, player.y + player.height / 2 - orb.y) - player.width / 2 - orb.radius < 1) { experience += (orb.value * player.xpMultiplier); experienceOrbs.splice(index, 1); } }); if(experience >= experienceNeeded) levelUp(); droids.forEach(droid => droid.update(player)); updateUI(); drawCrosshair(); }
-        function startGame() { mainMenu.style.display = 'none'; menuGoldDisplay.style.display = 'none'; gameContainer.style.display = 'flex'; player = new Player(canvas.width / 2 - 20, canvas.height / 2 - 30, selectedCharacter); droidsKilled = 0; experience = 0; level = 1; isEventActive = false; eventToTrigger = null; droids = []; projectiles = []; enemyProjectiles = []; experienceOrbs = []; particles = []; bossHealthContainer.style.display = 'none'; backgroundMusic.volume = volume; spawnDroids(); animate(); }
+        function levelUp(isAdmin = false) {
+            gamePaused = true;
+            canvas.style.cursor = 'default';
+            skillModal.style.display = 'block';
+            skillOptionsContainer.innerHTML = '';
+            const modalTitle = document.querySelector('#skillModal h2');
+            const modalDesc = document.querySelector('#skillModal p');
+            const availableSkills = allSkills.filter(s => !player.skills.includes(s.name));
+            let options = [];
+
+            if (isAdmin) {
+                modalTitle.textContent = "ADMIN MENU";
+                modalTitle.style.color = "#00FF00";
+                modalDesc.textContent = "Elige cualquier habilidad:";
+                options = availableSkills;
+                if (options.length === 0) {
+                    skillOptionsContainer.innerHTML = '<p>¡Ya tienes todo!</p>';
+                    setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }, 2000);
+                    return;
+                }
+            } else {
+                modalTitle.textContent = "¡NIVEL SUBIDO!";
+                modalTitle.style.color = "#FFFF00";
+                modalDesc.textContent = "Mejora táctica:";
+                while (options.length < 3 && availableSkills.length > 0) {
+                    options.push(availableSkills.splice(Math.floor(Math.random() * availableSkills.length), 1)[0]);
+                }
+                // Si no quedan habilidades disponibles, cerrar automáticamente
+                if (options.length === 0) {
+                    skillOptionsContainer.innerHTML = '<p style="color:#aaa;">¡Eres el soldado perfecto! No hay más mejoras.</p>';
+                    setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }, 2000);
+                    return;
+                }
+            }
+
+            options.forEach(skill => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `<span>${skill.name}</span><br><span style="font-size:0.8em; font-weight:normal;">${skill.description}</span>`;
+                btn.onclick = () => {
+                    skill.apply();
+                    player.skills.push(skill.name);
+                    if (!isAdmin) {
+                        level++;
+                        experience -= experienceNeeded;
+                        experienceNeeded = Math.floor(experienceNeeded * 1.5);
+                    }
+                    skillModal.style.display = 'none';
+                    gamePaused = false;
+                    canvas.style.cursor = 'none';
+                    // FIX CRÍTICO #5: cancelar bucle anterior antes de crear uno nuevo
+                    if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+                    animate();
+                };
+                skillOptionsContainer.appendChild(btn);
+            });
+        }
+
+        function updateUI() {
+            healthUI.textContent = `Salud: ${Math.ceil(player.health)} / ${player.maxHealth}`;
+            experienceUI.textContent = `Exp: ${Math.floor(experience)} / ${experienceNeeded}`;
+            killCounterUI.textContent = `Bajas (Oro): ${droidsKilled}`;
+            if (isEventActive) {
+                const boss = droids.find(d => d.isBoss);
+                if (boss) bossHealthFill.style.width = (boss.health / boss.maxHealth * 100) + '%';
+            }
+        }
+
+        function animate() {
+            if (gamePaused) return;
+            // FIX CRÍTICO #5: guardar el ID para poder cancelarlo si hace falta
+            animationId = requestAnimationFrame(animate);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (player.hasRegen && player.health < player.maxHealth) player.health += 0.02;
+
+            player.dx = 0; player.dy = 0;
+            if (keys.left) player.dx = -player.speed;
+            if (keys.right) player.dx = player.speed;
+            if (keys.up) player.dy = -player.speed;
+            if (keys.down) player.dy = player.speed;
+            player.update();
+            player.shoot(mouse.x, mouse.y);
+
+            particles.forEach((p, i) => { if (p.alpha <= 0) particles.splice(i, 1); else p.update(); });
+
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const proj = projectiles[i];
+                proj.update();
+                if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { projectiles.splice(i, 1); continue; }
+                let hitDroidInLoop = false;
+                for (let j = droids.length - 1; j >= 0; j--) {
+                    const droid = droids[j];
+                    let hitDetected = false;
+                    let dcX = droid.x + droid.width / 2, dcY = droid.y + droid.height / 2;
+                    if (droid instanceof DroidGenerator) {
+                        if (proj.x > droid.x && proj.x < droid.x + droid.width && proj.y > droid.y && proj.y < droid.y + droid.height) hitDetected = true;
+                    } else if (droid instanceof SpiderDroid || droid instanceof Droideka) {
+                        if (Math.hypot(proj.x - dcX, proj.y - dcY) - droid.hitboxRadius - proj.radius < 1) hitDetected = true;
+                    } else {
+                        dcY += 10;
+                        if (Math.hypot(proj.x - dcX, proj.y - dcY) - droid.hitboxRadius - proj.radius < 1) hitDetected = true;
+                    }
+                    if (hitDetected) {
+                        hitDroidInLoop = true;
+                        // FIX CRÍTICO #2: proj.damage ahora tiene el valor correcto del jugador
+                        let hitDamage = proj.damage;
+                        if (Math.random() < player.critChance) {
+                            hitDamage *= player.critMultiplier;
+                            for (let k = 0; k < 5; k++) particles.push(new Particle(proj.x, proj.y, { x: (Math.random() - 0.5) * 4, y: (Math.random() - 0.5) * 4 }, '#FFFF00'));
+                        }
+                        droid.health -= hitDamage;
+                        if (!player.piercingShots) { projectiles.splice(i, 1); break; }
+                    }
+                }
+                if (hitDroidInLoop && !player.piercingShots) continue;
+            }
+
+            let needsEventCheck = false;
+            for (let i = droids.length - 1; i >= 0; i--) {
+                const droid = droids[i];
+                if (droid.health <= 0) {
+                    if (!droid.isBoss && droid.countsAsKill) {
+                        droidsKilled++;
+                        needsEventCheck = true;
+                        if (player.lifeSteal) player.health = Math.min(player.maxHealth, player.health + 2);
+                    }
+                    for (let k = 0; k < (droid.isBoss ? 50 : 10); k++) {
+                        particles.push(new Particle(droid.x + droid.width / 2, droid.y + droid.height / 2, { x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 5 }, '#C2B280'));
+                    }
+                    experienceOrbs.push(new ExperienceOrb(droid.x + droid.width / 2, droid.y + droid.height / 2, droid.expValue));
+                    if (droid.isBoss) {
+                        if (typeof droid.destroy === 'function') droid.destroy();
+                        isEventActive = false;
+                        bossHealthContainer.style.display = 'none';
+                        spawnDroids();
+                        totalBossesStats++;
+                        localStorage.setItem('cloneCampaignTotalBosses', totalBossesStats);
+                    }
+                    droids.splice(i, 1);
+                }
+            }
+
+            // FIX CRÍTICO #4: lógica de eventos corregida con secuencia clara
+            // Cada 20 kills se activa un evento en ciclos de 60:
+            //   kill 20 → spider | kill 40 → generator | kill 60 → droideka | kill 80 → spider ...
+            if (needsEventCheck && !isEventActive) {
+                if (droidsKilled > 0 && droidsKilled % 20 === 0) {
+                    const cycle = (droidsKilled / 20) % 3;
+                    if (cycle === 1) eventToTrigger = 'spider';
+                    else if (cycle === 2) eventToTrigger = 'generator';
+                    else eventToTrigger = 'droideka';
+                }
+            }
+
+            if (eventToTrigger) { startEvent(eventToTrigger); eventToTrigger = null; }
+
+            for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+                const proj = enemyProjectiles[i];
+                proj.update();
+                if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { enemyProjectiles.splice(i, 1); continue; }
+                if (Math.hypot(proj.x - (player.x + player.width / 2), proj.y - (player.y + player.height / 2)) - (player.width / 2 * 0.8) - proj.radius < 1) {
+                    if (Math.random() >= player.evasionChance) {
+                        player.health -= proj.damage;
+                    } else {
+                        for (let k = 0; k < 3; k++) particles.push(new Particle(player.x + player.width / 2, player.y + player.height / 2, { x: (Math.random() - 0.5) * 3, y: (Math.random() - 0.5) * 3 }, '#00FFFF'));
+                    }
+                    enemyProjectiles.splice(i, 1);
+                    if (player.health <= 0) {
+                        player.health = 0;
+                        updateUI();
+                        gamePaused = true;
+                        setTimeout(triggerGameOver, 100);
+                    }
+                }
+            }
+
+            // FIX: iterar al revés para evitar saltar orbes al hacer splice
+            for (let i = experienceOrbs.length - 1; i >= 0; i--) {
+                const orb = experienceOrbs[i];
+                orb.update(player);
+                if (Math.hypot(player.x + player.width / 2 - orb.x, player.y + player.height / 2 - orb.y) - player.width / 2 - orb.radius < 1) {
+                    experience += (orb.value * player.xpMultiplier);
+                    experienceOrbs.splice(i, 1);
+                }
+            }
+
+            if (experience >= experienceNeeded) levelUp();
+
+            droids.forEach(droid => droid.update(player));
+            updateUI();
+            drawCrosshair();
+        }
+
+        function startGame() {
+            mainMenu.style.display = 'none';
+            menuGoldDisplay.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            player = new Player(canvas.width / 2 - 20, canvas.height / 2 - 30, selectedCharacter);
+            droidsKilled = 0; experience = 0; level = 1;
+            isEventActive = false; eventToTrigger = null;
+            gameOverTriggered = false;   // AVISO #5: reset del guard en cada partida nueva
+            droids = []; projectiles = []; enemyProjectiles = []; experienceOrbs = []; particles = [];
+            bossHealthContainer.style.display = 'none';
+            backgroundMusic.volume = volume;
+            // FIX CRÍTICO #5: cancelar cualquier bucle previo antes de iniciar
+            if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+            spawnDroids();
+            animate();
+        }
+
         loadControls();
     </script>
 </body>
