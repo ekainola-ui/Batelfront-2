@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Star Wars: Clone Campaign - Full Game + Admin + Droideka 3.0 + Oro + Logros + 6 Clones</title>
+    <title>Star Wars: Clone Campaign - Mapa Grande</title>
     <style>
         body {
             margin: 0; background-color: #111; display: flex; justify-content: center; 
-            align-items: center; height: 100vh; color: #eee; font-family: 'Arial', sans-serif; 
+            align-items: center; min-height: 100vh; color: #eee; font-family: 'Arial', sans-serif; 
             overflow: hidden; touch-action: none;
         }
         .menu { 
@@ -16,7 +16,7 @@
             position: absolute; z-index: 100;
         }
         #characterMenu, #settingsMenu, #gameContainer, #pauseOverlay, #achievementsMenu { display: none; }
-        #characterMenu { width: 650px; } 
+        #characterMenu { width: 700px; } 
         #achievementsMenu { width: 550px; }
         #menuGoldDisplay { 
             position: absolute; top: 20px; right: 30px; color: #FFD700; 
@@ -36,7 +36,7 @@
         .keybind-button { background-color: #444; border: 1px solid #aaa; color: #fff; padding: 5px 15px; min-width: 120px; text-align: center; cursor: pointer; }
         .keybind-button.waiting { border-color: #FFFF00; color: #FFFF00; }
         #characterOptions { display: flex; justify-content: space-around; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        .character-option { border: 3px solid #555; padding: 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; flex: 1 1 30%; min-width: 150px; text-align: center; }
+        .character-option { border: 3px solid #555; padding: 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; flex: 1 1 28%; min-width: 150px; text-align: center; }
         .character-option h3 { margin-top: 0; font-size: 1.2em; }
         .character-option p { margin: 5px 0; font-size: 0.9em; color: #ccc; }
         .character-option:hover { background-color: rgba(255, 255, 0, 0.1); border-color: #FFFF00; }
@@ -65,9 +65,18 @@
         .admin-box { margin-top: 20px; padding: 15px; border: 1px dashed #555; background: #000; }
         .admin-input { background: #111; border: 1px solid #FFFF00; color: #00FF00; padding: 10px; text-align: center; width: 80%; font-family: monospace; font-size: 1.1em; margin-bottom: 10px; }
         #gameContainer { flex-direction: column; align-items: center; position: relative; }
-        canvas { border: 2px solid #FFFF00; background-color: #000; cursor: none; }
-        #infoPanel { width: 800px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 1.2em; }
-        #bossHealthContainer { display: none; position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 500px; text-align: center; }
+
+        /* Canvas escalado para pantallas más pequeñas */
+        #gameCanvas {
+            border: 2px solid #FFFF00;
+            background-color: #000;
+            cursor: none;
+            max-width: 100vw;
+            max-height: calc(100vh - 60px);
+        }
+
+        #infoPanel { width: 1200px; max-width: 100vw; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 1.1em; }
+        #bossHealthContainer { display: none; position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); width: 600px; text-align: center; }
         #bossHealthBar { width: 100%; height: 25px; background-color: #555; border: 2px solid #FFF; }
         #bossHealthFill { width: 100%; height: 100%; background-color: #FF0000; transition: width 0.2s linear; }
         #bossName { color: #FF0000; font-size: 1.5em; font-weight: bold; text-shadow: 1px 1px 5px #000; }
@@ -83,6 +92,7 @@
 
     <div id="mainMenu" class="menu" style="display: block;">
         <h1>Clone Campaign</h1>
+        <p style="color:#aaa; font-size:0.9em; margin-top:-15px; margin-bottom:15px;">🗺️ Mapa ampliado: 1200 × 750</p>
         <button id="playButton" class="menu-button">Jugar</button>
         <button id="characterSelectButton" class="menu-button">Cuartel (Personajes)</button>
         <button id="achievementsButton" class="menu-button">Logros</button>
@@ -172,13 +182,18 @@
 
     <script>
         // =============================================================
+        // CONFIGURACIÓN DEL MAPA — ahora 1200 × 750
+        // =============================================================
+        const MAP_W = 1200;
+        const MAP_H = 750;
+
+        // =============================================================
         // SISTEMA DE ORO, ESTADÍSTICAS Y PERSONAJES
         // =============================================================
         let globalGold = parseInt(localStorage.getItem('cloneCampaignGold')) || 0;
         let unlockedChars = JSON.parse(localStorage.getItem('cloneCampaignUnlockedChars')) || ['clone'];
         let totalKillsStats = parseInt(localStorage.getItem('cloneCampaignTotalKills')) || 0;
         let totalBossesStats = parseInt(localStorage.getItem('cloneCampaignTotalBosses')) || 0;
-        // AVISO #7: persistir logros desbloqueados para que no se "re-bloqueen" al gastar oro
         let unlockedAchievements = JSON.parse(localStorage.getItem('cloneCampaignAchievements')) || [];
 
         const charPrices = { 'clone': 0, '501': 100, '327': 250, 'rex': 500, 'arc': 750, 'commando': 1000 };
@@ -226,7 +241,6 @@
             list.innerHTML = '';
             let changed = false;
             achievementsData.forEach(ach => {
-                // AVISO #7: un logro desbloqueado lo queda para siempre (se persiste en localStorage)
                 const justUnlocked = ach.req();
                 if (justUnlocked && !unlockedAchievements.includes(ach.id)) {
                     unlockedAchievements.push(ach.id);
@@ -257,7 +271,23 @@
         const pauseOverlay = document.getElementById('pauseOverlay');
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 800; canvas.height = 600;
+
+        // Canvas con el nuevo tamaño
+        canvas.width = MAP_W;
+        canvas.height = MAP_H;
+
+        // Escalar visualmente si la pantalla es pequeña
+        function scaleCanvas() {
+            const maxW = window.innerWidth;
+            const maxH = window.innerHeight - 60;
+            const scaleX = maxW / MAP_W;
+            const scaleY = maxH / MAP_H;
+            const scale = Math.min(scaleX, scaleY, 1);
+            canvas.style.width = (MAP_W * scale) + 'px';
+            canvas.style.height = (MAP_H * scale) + 'px';
+            document.getElementById('infoPanel').style.width = (MAP_W * scale) + 'px';
+        }
+        window.addEventListener('resize', scaleCanvas);
 
         const healthUI = document.getElementById('health');
         const experienceUI = document.getElementById('experience');
@@ -273,15 +303,11 @@
         let player;
         let selectedCharacter = 'clone';
         let gamePaused = false;
-        let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+        let mouse = { x: MAP_W / 2, y: MAP_H / 2 };
         let droidsKilled = 0;
         let isEventActive = false;
         let spawnIntervalID;
         let eventToTrigger = null;
-
-        // -------------------------------------------------------
-        // FIX CRÍTICO #5: animationId para evitar bucles múltiples
-        // -------------------------------------------------------
         let animationId = null;
 
         let controls = { up: 'w', down: 's', left: 'a', right: 'd' };
@@ -412,17 +438,16 @@
             }
         }
 
-        let gameOverTriggered = false;  // AVISO #5: guard contra doble ejecución
+        let gameOverTriggered = false;
 
-        // AVISO #4: helper para limpiar todos los timers activos de jefes antes de salir/morir.
         function cleanupActiveBossTimers() {
             droids.forEach(d => { if (typeof d.destroy === 'function') d.destroy(); });
         }
 
         function dieAndExit() {
-            if (gameOverTriggered) return;       // AVISO #5
+            if (gameOverTriggered) return;
             gameOverTriggered = true;
-            cleanupActiveBossTimers();           // AVISO #4
+            cleanupActiveBossTimers();
             if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
             globalGold += droidsKilled;
             totalKillsStats += droidsKilled;
@@ -432,9 +457,9 @@
         }
 
         function triggerGameOver() {
-            if (gameOverTriggered) return;       // AVISO #5
+            if (gameOverTriggered) return;
             gameOverTriggered = true;
-            cleanupActiveBossTimers();           // AVISO #4
+            cleanupActiveBossTimers();
             if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
             globalGold += droidsKilled;
             totalKillsStats += droidsKilled;
@@ -442,6 +467,39 @@
             updateGoldUI();
             alert(`GAME OVER.\nHas destruido a ${droidsKilled} droides.\n¡Ganaste ${droidsKilled} de Oro!`);
             location.reload();
+        }
+
+        // =============================================================
+        // FONDO ESTRELLADO (nuevo — aprovecha el mapa grande)
+        // =============================================================
+        const stars = [];
+        for (let i = 0; i < 180; i++) {
+            stars.push({
+                x: Math.random() * MAP_W,
+                y: Math.random() * MAP_H,
+                r: Math.random() * 1.5 + 0.3,
+                alpha: Math.random() * 0.6 + 0.3
+            });
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = '#050510';
+            ctx.fillRect(0, 0, MAP_W, MAP_H);
+            stars.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+                ctx.fill();
+            });
+            // Grid tenue para dar sensación de espacio
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            for (let gx = 0; gx <= MAP_W; gx += 100) {
+                ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, MAP_H); ctx.stroke();
+            }
+            for (let gy = 0; gy <= MAP_H; gy += 100) {
+                ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(MAP_W, gy); ctx.stroke();
+            }
         }
 
         // =============================================================
@@ -479,7 +537,6 @@
                 } else if (this.type === 'rex') {
                     this.health = 300; this.maxHealth = 300; this.damage = 15;
                 } else if (this.type === 'arc') {
-                    // FIX CRÍTICO #3: ARC ahora inicializa maxHealth correctamente
                     this.health = 100; this.maxHealth = 100;
                     this.speed = 7.5; this.fireRate = 100;
                     this.evasionChance = 0.20; this.skills.push('Evasión');
@@ -548,9 +605,9 @@
             update() {
                 this.x += this.dx; this.y += this.dy;
                 if (this.x < 0) this.x = 0;
-                if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+                if (this.x + this.width > MAP_W) this.x = MAP_W - this.width;
                 if (this.y < 0) this.y = 0;
-                if (this.y + this.height > canvas.height) this.y = canvas.height - this.height;
+                if (this.y + this.height > MAP_H) this.y = MAP_H - this.height;
                 this.draw();
             }
 
@@ -566,7 +623,6 @@
                 else if (this.tripleShot) { bColor = '#fff'; }
                 else if (this.piercingShots) { bColor = '#fff'; }
 
-                // FIX CRÍTICO #2: se pasa this.damage al constructor de Projectile
                 if (this.tripleShot) {
                     const spread = Math.PI / 12;
                     projectiles.push(new Projectile(shootOriginX, shootOriginY, { x: Math.cos(mainAngle) * this.projectileSpeed, y: Math.sin(mainAngle) * this.projectileSpeed }, bColor, bSize, this.damage));
@@ -735,7 +791,6 @@
                 }
             }
             shoot(player) {
-                // FIX CRÍTICO #1: usamos cX/cY correctamente en lugar de shootX/shootY inexistentes
                 const cX = this.x + this.width / 2, cY = this.y + this.height / 2;
                 const angle = Math.atan2((player.y + player.height / 2) - cY, (player.x + player.width / 2) - cX);
                 enemyProjectiles.push(new Projectile(cX, cY, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 12, 12));
@@ -744,8 +799,7 @@
                 this.modeTimer++;
                 if (this.modeTimer > 120) {
                     this.mode = this.mode === 'roll' ? 'shoot' : 'roll';
-                    this.modeTimer = 0;
-                    this.shootFrame = 0;
+                    this.modeTimer = 0; this.shootFrame = 0;
                 }
                 if (this.mode === 'roll') {
                     const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
@@ -756,7 +810,6 @@
                     if (this.shootFrame >= 4) { this.shoot(player); this.shootFrame = 0; }
                 }
                 this.draw();
-                // AVISO #1: drawHealthBar ahora se llama en Droideka igual que en los demás droides.
                 this.drawHealthBar();
             }
         }
@@ -806,7 +859,6 @@
                 backgroundMusic.play();
                 canvas.style.cursor = 'none';
                 pauseOverlay.style.display = 'none';
-                // FIX CRÍTICO #5: cancelar bucle anterior antes de crear uno nuevo
                 if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
                 animate();
             }
@@ -837,10 +889,14 @@
             if (rk === controls.up) keys.up = false;
             if (rk === controls.down) keys.down = false;
         });
+
+        // Ratón: corregir coordenadas teniendo en cuenta el escalado CSS del canvas
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
+            const scaleX = MAP_W / rect.width;
+            const scaleY = MAP_H / rect.height;
+            mouse.x = (e.clientX - rect.left) * scaleX;
+            mouse.y = (e.clientY - rect.top) * scaleY;
         });
 
         function spawnDroids() {
@@ -849,10 +905,10 @@
                 if (gamePaused || isEventActive) return;
                 const side = Math.floor(Math.random() * 4);
                 let x, y;
-                if (side === 0) { x = Math.random() * canvas.width; y = -50; }
-                else if (side === 1) { x = canvas.width + 50; y = Math.random() * canvas.height; }
-                else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 50; }
-                else { x = -50; y = Math.random() * canvas.height; }
+                if (side === 0) { x = Math.random() * MAP_W; y = -50; }
+                else if (side === 1) { x = MAP_W + 50; y = Math.random() * MAP_H; }
+                else if (side === 2) { x = Math.random() * MAP_W; y = MAP_H + 50; }
+                else { x = -50; y = Math.random() * MAP_H; }
                 if (Math.random() < 0.20) droids.push(new SuperDroid(x, y));
                 else droids.push(new Droid(x, y));
             }, spawnInterval);
@@ -863,9 +919,9 @@
             clearInterval(spawnIntervalID);
             enemyProjectiles.length = 0;
             droids.length = 0;
-            if (type === 'spider') { droids.push(new SpiderDroid(canvas.width / 2 - 40, 100)); bossName.textContent = 'DROIDE ARAÑA'; }
-            else if (type === 'generator') { droids.push(new DroidGenerator(canvas.width / 2 - 50, 50)); bossName.textContent = 'GENERADOR DE DROIDES'; }
-            else if (type === 'droideka') { droids.push(new Droideka(canvas.width / 2 - 30, 100)); bossName.textContent = 'DROIDEKA DESTRUCTOR'; }
+            if (type === 'spider') { droids.push(new SpiderDroid(MAP_W / 2 - 40, 100)); bossName.textContent = 'DROIDE ARAÑA'; }
+            else if (type === 'generator') { droids.push(new DroidGenerator(MAP_W / 2 - 50, 50)); bossName.textContent = 'GENERADOR DE DROIDES'; }
+            else if (type === 'droideka') { droids.push(new Droideka(MAP_W / 2 - 30, 100)); bossName.textContent = 'DROIDEKA DESTRUCTOR'; }
             bossHealthContainer.style.display = 'block';
         }
 
@@ -915,7 +971,6 @@
                 while (options.length < 3 && availableSkills.length > 0) {
                     options.push(availableSkills.splice(Math.floor(Math.random() * availableSkills.length), 1)[0]);
                 }
-                // Si no quedan habilidades disponibles, cerrar automáticamente
                 if (options.length === 0) {
                     skillOptionsContainer.innerHTML = '<p style="color:#aaa;">¡Eres el soldado perfecto! No hay más mejoras.</p>';
                     setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }, 2000);
@@ -937,7 +992,6 @@
                     skillModal.style.display = 'none';
                     gamePaused = false;
                     canvas.style.cursor = 'none';
-                    // FIX CRÍTICO #5: cancelar bucle anterior antes de crear uno nuevo
                     if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
                     animate();
                 };
@@ -957,10 +1011,10 @@
 
         function animate() {
             if (gamePaused) return;
-            // FIX CRÍTICO #5: guardar el ID para poder cancelarlo si hace falta
             animationId = requestAnimationFrame(animate);
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Fondo estrellado en lugar de clearRect negro
+            drawBackground();
 
             if (player.hasRegen && player.health < player.maxHealth) player.health += 0.02;
 
@@ -977,7 +1031,7 @@
             for (let i = projectiles.length - 1; i >= 0; i--) {
                 const proj = projectiles[i];
                 proj.update();
-                if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { projectiles.splice(i, 1); continue; }
+                if (proj.x < 0 || proj.x > MAP_W || proj.y < 0 || proj.y > MAP_H) { projectiles.splice(i, 1); continue; }
                 let hitDroidInLoop = false;
                 for (let j = droids.length - 1; j >= 0; j--) {
                     const droid = droids[j];
@@ -993,7 +1047,6 @@
                     }
                     if (hitDetected) {
                         hitDroidInLoop = true;
-                        // FIX CRÍTICO #2: proj.damage ahora tiene el valor correcto del jugador
                         let hitDamage = proj.damage;
                         if (Math.random() < player.critChance) {
                             hitDamage *= player.critMultiplier;
@@ -1031,9 +1084,6 @@
                 }
             }
 
-            // FIX CRÍTICO #4: lógica de eventos corregida con secuencia clara
-            // Cada 20 kills se activa un evento en ciclos de 60:
-            //   kill 20 → spider | kill 40 → generator | kill 60 → droideka | kill 80 → spider ...
             if (needsEventCheck && !isEventActive) {
                 if (droidsKilled > 0 && droidsKilled % 20 === 0) {
                     const cycle = (droidsKilled / 20) % 3;
@@ -1048,7 +1098,7 @@
             for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
                 const proj = enemyProjectiles[i];
                 proj.update();
-                if (proj.x < 0 || proj.x > canvas.width || proj.y < 0 || proj.y > canvas.height) { enemyProjectiles.splice(i, 1); continue; }
+                if (proj.x < 0 || proj.x > MAP_W || proj.y < 0 || proj.y > MAP_H) { enemyProjectiles.splice(i, 1); continue; }
                 if (Math.hypot(proj.x - (player.x + player.width / 2), proj.y - (player.y + player.height / 2)) - (player.width / 2 * 0.8) - proj.radius < 1) {
                     if (Math.random() >= player.evasionChance) {
                         player.health -= proj.damage;
@@ -1065,7 +1115,6 @@
                 }
             }
 
-            // FIX: iterar al revés para evitar saltar orbes al hacer splice
             for (let i = experienceOrbs.length - 1; i >= 0; i--) {
                 const orb = experienceOrbs[i];
                 orb.update(player);
@@ -1086,15 +1135,15 @@
             mainMenu.style.display = 'none';
             menuGoldDisplay.style.display = 'none';
             gameContainer.style.display = 'flex';
-            player = new Player(canvas.width / 2 - 20, canvas.height / 2 - 30, selectedCharacter);
+            player = new Player(MAP_W / 2 - 20, MAP_H / 2 - 30, selectedCharacter);
             droidsKilled = 0; experience = 0; level = 1;
             isEventActive = false; eventToTrigger = null;
-            gameOverTriggered = false;   // AVISO #5: reset del guard en cada partida nueva
+            gameOverTriggered = false;
             droids = []; projectiles = []; enemyProjectiles = []; experienceOrbs = []; particles = [];
             bossHealthContainer.style.display = 'none';
             backgroundMusic.volume = volume;
-            // FIX CRÍTICO #5: cancelar cualquier bucle previo antes de iniciar
             if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+            scaleCanvas();
             spawnDroids();
             animate();
         }
