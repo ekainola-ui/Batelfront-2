@@ -603,7 +603,7 @@
                 this.bulletSize = 5;
                 this.xpMultiplier = 1.0; this.piercingShots = false; this.tripleShot = false;
                 this.hasRegen = false; this.hasMagnet = false; this.critChance = 0; this.critMultiplier = 2;
-                this.lifeSteal = false; this.evasionChance = 0; this.rearShot = false;
+                this.lifeSteal = false; this.evasionChance = 0; this.rearShot = false; this.explosiveShots = false;
 
                 if (this.type === '501') {
                     this.health = 200; this.maxHealth = 200; this.fireRate = 350;
@@ -1030,7 +1030,7 @@
 
         const allSkills = [
             { name: 'Fuego Rápido', description: 'Aumenta cadencia.', apply: () => player.fireRate *= 0.75 },
-            { name: 'Disparo Penetrante', description: 'Atraviesa enemigos.', apply: () => player.piercingShots = true },
+            { name: 'Disparo Explosivo', description: 'Balas explotan al impactar (radio 70px).', apply: () => player.explosiveShots = true },
             { name: 'Velocidad', description: 'Aumenta movimiento.', apply: () => player.speed *= 1.2 },
             { name: 'Blindaje Extra', description: 'Aumenta salud base.', apply: () => { player.health += 25; player.maxHealth += 25; } },
             { name: 'Potencia', description: 'Aumenta daño.', apply: () => player.damage *= 1.5 },
@@ -1174,6 +1174,35 @@
                             for (let k = 0; k < 5; k++) particles.push(new Particle(proj.x, proj.y, { x: (Math.random() - 0.5) * 4, y: (Math.random() - 0.5) * 4 }, '#FFFF00'));
                         }
                         droid.health -= hitDamage;
+                        // Disparo Explosivo: daño en área al impactar
+                        if (player.explosiveShots) {
+                            const expR = 70;
+                            const expX = proj.x, expY = proj.y;
+                            // Partículas de explosión
+                            for (let k = 0; k < 12; k++) {
+                                const ang = (Math.PI * 2 / 12) * k;
+                                particles.push(new Particle(expX, expY, { x: Math.cos(ang) * (Math.random() * 3 + 1), y: Math.sin(ang) * (Math.random() * 3 + 1) }, '#FF8800'));
+                            }
+                            // Dibujar círculo de onda expansiva (efecto visual inmediato)
+                            ctx.save();
+                            ctx.strokeStyle = 'rgba(255,140,0,0.7)';
+                            ctx.lineWidth = 2;
+                            ctx.beginPath(); ctx.arc(expX, expY, expR, 0, Math.PI * 2); ctx.stroke();
+                            ctx.restore();
+                            // Daño a todos los droides en el radio (excepto el ya golpeado)
+                            droids.forEach((other, oi) => {
+                                if (oi === j) return;
+                                const odX = other.x + other.width / 2, odY = other.y + other.height / 2;
+                                if (Math.hypot(expX - odX, expY - odY) <= expR) {
+                                    other.health -= hitDamage * 0.5;
+                                    if (!other.isBoss) {
+                                        const kbA = Math.atan2(odY - expY, odX - expX);
+                                        other.vx += Math.cos(kbA) * 5;
+                                        other.vy += Math.sin(kbA) * 5;
+                                    }
+                                }
+                            });
+                        }
                         // Knockback: el droide sale despedido en dirección del impacto (solo droides normales)
                         if (!droid.isBoss) {
                             const kbAngle = Math.atan2(droid.y + droid.height/2 - proj.y, droid.x + droid.width/2 - proj.x);
