@@ -594,7 +594,8 @@
         class Player {
             constructor(x, y, type) {
                 this.x = x; this.y = y; this.width = 40; this.height = 60;
-                this.dx = 0; this.dy = 0; this.skills = []; this.canShoot = true;
+                this.dx = 0; this.dy = 0; this.vx = 0; this.vy = 0;
+                this.skills = []; this.canShoot = true;
                 this.type = type;
                 this.speed = 5; this.health = 100; this.maxHealth = 100;
                 this.fireRate = 400; this.projectileSpeed = 7; this.damage = 10;
@@ -677,11 +678,15 @@
             }
 
             update() {
-                this.x += this.dx; this.y += this.dy;
-                if (this.x < 0) this.x = 0;
-                if (this.x + this.width > MAP_W) this.x = MAP_W - this.width;
-                if (this.y < 0) this.y = 0;
-                if (this.y + this.height > MAP_H) this.y = MAP_H - this.height;
+                // Suavizado de movimiento: interpolamos hacia la velocidad objetivo
+                this.vx += (this.dx - this.vx) * 0.22;
+                this.vy += (this.dy - this.vy) * 0.22;
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) { this.x = 0; this.vx = 0; }
+                if (this.x + this.width > MAP_W) { this.x = MAP_W - this.width; this.vx = 0; }
+                if (this.y < 0) { this.y = 0; this.vy = 0; }
+                if (this.y + this.height > MAP_H) { this.y = MAP_H - this.height; this.vy = 0; }
                 this.draw();
             }
 
@@ -732,6 +737,7 @@
                 this.expValue = 25; this.fireRate = 2800; this.canShoot = true;
                 this.projectileSpeed = 6; this.hitboxRadius = this.width / 2;
                 this.isBoss = false; this.countsAsKill = true;
+                this.vx = 0; this.vy = 0; this.friction = 0.84;
             }
             drawHealthBar() {
                 ctx.fillStyle = '#333'; ctx.fillRect(this.x, this.y - 15, this.width, 4);
@@ -751,8 +757,14 @@
             }
             update(player) {
                 const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
-                this.x += Math.cos(angle) * this.speed;
-                this.y += Math.sin(angle) * this.speed;
+                // Aceleración suave hacia el jugador
+                this.vx += (Math.cos(angle) * this.speed - this.vx) * 0.12;
+                this.vy += (Math.sin(angle) * this.speed - this.vy) * 0.12;
+                // Fricción (amortiguación del knockback)
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.x += this.vx;
+                this.y += this.vy;
                 this.shoot(player);
                 this.draw();
                 if (!this.isBoss) this.drawHealthBar();
@@ -877,8 +889,12 @@
                 }
                 if (this.mode === 'roll') {
                     const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
-                    this.x += Math.cos(angle) * this.speed;
-                    this.y += Math.sin(angle) * this.speed;
+                    this.vx += (Math.cos(angle) * this.speed - this.vx) * 0.15;
+                    this.vy += (Math.sin(angle) * this.speed - this.vy) * 0.15;
+                    this.vx *= this.friction;
+                    this.vy *= this.friction;
+                    this.x += this.vx;
+                    this.y += this.vy;
                 } else {
                     this.shootFrame++;
                     if (this.shootFrame >= 4) { this.shoot(player); this.shootFrame = 0; }
@@ -1145,6 +1161,11 @@
                             for (let k = 0; k < 5; k++) particles.push(new Particle(proj.x, proj.y, { x: (Math.random() - 0.5) * 4, y: (Math.random() - 0.5) * 4 }, '#FFFF00'));
                         }
                         droid.health -= hitDamage;
+                        // Knockback: el droide sale despedido en dirección del impacto
+                        const kbForce = droid.isBoss ? 2.5 : 9;
+                        const kbAngle = Math.atan2(droid.y + droid.height/2 - proj.y, droid.x + droid.width/2 - proj.x);
+                        droid.vx += Math.cos(kbAngle) * kbForce;
+                        droid.vy += Math.sin(kbAngle) * kbForce;
                         if (!player.piercingShots) { projectiles.splice(i, 1); break; }
                     }
                 }
@@ -1194,6 +1215,10 @@
                 if (Math.hypot(proj.x - (player.x + player.width / 2), proj.y - (player.y + player.height / 2)) - (player.width / 2 * 0.8) - proj.radius < 1) {
                     if (Math.random() >= player.evasionChance) {
                         player.health -= proj.damage;
+                        // Knockback al jugador
+                        const kbAngle = Math.atan2(player.y + player.height/2 - proj.y, player.x + player.width/2 - proj.x);
+                        player.vx += Math.cos(kbAngle) * 5;
+                        player.vy += Math.sin(kbAngle) * 5;
                     } else {
                         for (let k = 0; k < 3; k++) particles.push(new Particle(player.x + player.width / 2, player.y + player.height / 2, { x: (Math.random() - 0.5) * 3, y: (Math.random() - 0.5) * 3 }, '#00FFFF'));
                     }
@@ -1219,6 +1244,32 @@
             if (experience >= experienceNeeded) levelUp();
 
             droids.forEach(droid => droid.update(player));
+
+            // Separación física entre droides: se empujan entre sí al solaparse
+            for (let i = 0; i < droids.length; i++) {
+                for (let j = i + 1; j < droids.length; j++) {
+                    const a = droids[i], b = droids[j];
+                    if (a instanceof DroidGenerator || b instanceof DroidGenerator) continue;
+                    const aCX = a.x + a.width / 2, aCY = a.y + a.height / 2;
+                    const bCX = b.x + b.width / 2, bCY = b.y + b.height / 2;
+                    const rA = a.hitboxRadius || a.width / 2;
+                    const rB = b.hitboxRadius || b.width / 2;
+                    const minDist = rA + rB;
+                    const ddx = bCX - aCX, ddy = bCY - aCY;
+                    const dist = Math.hypot(ddx, ddy) || 0.1;
+                    if (dist < minDist) {
+                        const overlap = (minDist - dist);
+                        const nx = ddx / dist, ny = ddy / dist;
+                        // Corrección de posición inmediata (la mitad cada uno)
+                        a.x -= nx * overlap * 0.4; a.y -= ny * overlap * 0.4;
+                        b.x += nx * overlap * 0.4; b.y += ny * overlap * 0.4;
+                        // Impulso de velocidad para que reboten
+                        const impulse = overlap * 0.25;
+                        a.vx -= nx * impulse; a.vy -= ny * impulse;
+                        b.vx += nx * impulse; b.vy += ny * impulse;
+                    }
+                }
+            }
             updateUI();
             drawCrosshair();
         }
