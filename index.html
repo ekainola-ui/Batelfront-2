@@ -462,6 +462,7 @@
                 enemyProjectiles.length = 0;
                 isEventActive = false;
                 bossHealthContainer.style.display = 'none';
+                droidScaling = Math.round((droidScaling + 0.1) * 10) / 10;
                 totalBossesStats++;
                 localStorage.setItem('cloneCampaignTotalBosses', totalBossesStats);
                 spawnDroids();
@@ -733,8 +734,11 @@
         class Droid {
             constructor(x, y) {
                 this.x = x; this.y = y; this.width = 30; this.height = 50;
-                this.health = 30; this.maxHealth = 30; this.speed = 2.2;
+                this.health = Math.round(30 * droidScaling);
+                this.maxHealth = this.health;
+                this.speed = 2.2;
                 this.expValue = 25; this.fireRate = 2800; this.canShoot = true;
+                this.shootDamage = Math.round(15 * droidScaling);
                 this.projectileSpeed = 6; this.hitboxRadius = this.width / 2;
                 this.isBoss = false; this.countsAsKill = true;
                 this.vx = 0; this.vy = 0; this.friction = 0.84;
@@ -751,7 +755,7 @@
             shoot(player) {
                 if (!this.canShoot || gamePaused) return;
                 const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
-                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 6, 15));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle) * this.projectileSpeed, y: Math.sin(angle) * this.projectileSpeed }, '#FF0000', 6, this.shootDamage));
                 this.canShoot = false;
                 setTimeout(() => { this.canShoot = true; }, this.fireRate);
             }
@@ -774,7 +778,10 @@
         class SuperDroid extends Droid {
             constructor(x, y) {
                 super(x, y);
-                this.health = 70; this.maxHealth = 70; this.expValue = 50;
+                this.health = Math.round(70 * droidScaling);
+                this.maxHealth = this.health;
+                this.shootDamage = Math.round(20 * droidScaling);
+                this.expValue = 50;
                 this.color = '#505050'; this.fireRate = 2200; this.projectileSpeed = 7;
                 this.hitboxRadius = this.width / 2 + 5; this.speed = 2.8;
             }
@@ -787,8 +794,8 @@
                 if (!this.canShoot || gamePaused) return;
                 const angle = Math.atan2((player.y + player.height / 2) - (this.y + this.height / 2), (player.x + player.width / 2) - (this.x + this.width / 2));
                 const spreadAngle = Math.PI / 18;
-                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle - spreadAngle) * this.projectileSpeed, y: Math.sin(angle - spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20));
-                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle + spreadAngle) * this.projectileSpeed, y: Math.sin(angle + spreadAngle) * this.projectileSpeed }, '#FF0000', 6, 20));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle - spreadAngle) * this.projectileSpeed, y: Math.sin(angle - spreadAngle) * this.projectileSpeed }, '#FF0000', 6, this.shootDamage));
+                enemyProjectiles.push(new Projectile(this.x + this.width / 2, this.y + this.height / 2, { x: Math.cos(angle + spreadAngle) * this.projectileSpeed, y: Math.sin(angle + spreadAngle) * this.projectileSpeed }, '#FF0000', 6, this.shootDamage));
                 this.canShoot = false;
                 setTimeout(() => { this.canShoot = true; }, this.fireRate);
             }
@@ -936,6 +943,8 @@
 
         let projectiles = [], enemyProjectiles = [], droids = [], experienceOrbs = [], particles = [];
         let experience = 0, level = 1, experienceNeeded = 100, spawnInterval = 2000;
+        let droidScaling = 1.0;   // +10% vida y daño por cada jefe derrotado
+        let scalingNotif = null;  // notificación en pantalla
         const keys = { up: false, down: false, left: false, right: false };
 
         function togglePause() {
@@ -1189,6 +1198,9 @@
                         if (typeof droid.destroy === 'function') droid.destroy();
                         isEventActive = false;
                         bossHealthContainer.style.display = 'none';
+                        droidScaling = Math.round((droidScaling + 0.1) * 10) / 10;
+                        const pct = Math.round((droidScaling - 1) * 100);
+                        scalingNotif = { text: `⚠ DROIDES REFORZADOS +10% (total: +${pct}%)`, timer: 180 };
                         spawnDroids();
                         totalBossesStats++;
                         localStorage.setItem('cloneCampaignTotalBosses', totalBossesStats);
@@ -1271,6 +1283,22 @@
                 }
             }
             updateUI();
+
+            // Notificación de droides reforzados
+            if (scalingNotif && scalingNotif.timer > 0) {
+                const alpha = Math.min(1, scalingNotif.timer / 40);
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.font = 'bold 22px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#FF4444';
+                ctx.shadowColor = '#FF0000';
+                ctx.shadowBlur = 12;
+                ctx.fillText(scalingNotif.text, MAP_W / 2, 60);
+                ctx.restore();
+                scalingNotif.timer--;
+            }
+
             drawCrosshair();
         }
 
@@ -1289,6 +1317,7 @@
             droidsKilled = 0; experience = 0; level = 1;
             isEventActive = false; eventToTrigger = null;
             gameOverTriggered = false;
+            droidScaling = 1.0; scalingNotif = null;
             droids = []; projectiles = []; enemyProjectiles = []; experienceOrbs = []; particles = [];
             bossHealthContainer.style.display = 'none';
             backgroundMusic.volume = volume;
