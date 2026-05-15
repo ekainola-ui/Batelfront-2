@@ -236,6 +236,7 @@
     <div id="gameContainer">
         <div id="infoPanel">
             <span id="health">Salud: 100</span>
+            <span id="levelDisplay">Nivel: 1</span>
             <span id="killCounter">Bajas (Oro): 0</span>
             <span id="experience">Experiencia: 0 / 100</span>
         </div>
@@ -320,7 +321,6 @@
                     changed = true;
                 }
                 const isUnlocked = unlockedAchievements.includes(ach.id);
-                if (changed) localStorage.setItem('cloneCampaignAchievements', JSON.stringify(unlockedAchievements));
                 const statusClass = isUnlocked ? 'unlocked-label' : 'locked-label';
                 const statusText = isUnlocked ? 'DESBLOQUEADO' : 'BLOQUEADO';
                 const itemClass = isUnlocked ? 'achievement-item unlocked' : 'achievement-item';
@@ -331,6 +331,7 @@
                         <div class="achievement-status ${statusClass}">${statusText}</div>
                     </div>`;
             });
+            if (changed) localStorage.setItem('cloneCampaignAchievements', JSON.stringify(unlockedAchievements));
         }
 
         // =============================================================
@@ -481,7 +482,7 @@
                 status.textContent = "";
                 pauseOverlay.style.display = 'none';
                 gamePaused = false;
-                canvas.style.cursor = 'none';
+                canvas.style.cursor = platformMode === 'mobile' ? 'default' : 'none';
                 if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
                 animate();
             }, 1000);
@@ -545,36 +546,39 @@
         }
 
         // =============================================================
-        // FONDO ESTRELLADO (nuevo — aprovecha el mapa grande)
+        // FONDO ESTRELLADO — se pinta una sola vez en canvas offscreen
         // =============================================================
-        const stars = [];
+        const bgCanvas = document.createElement('canvas');
+        bgCanvas.width = MAP_W; bgCanvas.height = MAP_H;
+        const bgCtx = bgCanvas.getContext('2d');
+
+        bgCtx.fillStyle = '#050510';
+        bgCtx.fillRect(0, 0, MAP_W, MAP_H);
+
+        // Estrellas
         for (let i = 0; i < 180; i++) {
-            stars.push({
-                x: Math.random() * MAP_W,
-                y: Math.random() * MAP_H,
-                r: Math.random() * 1.5 + 0.3,
-                alpha: Math.random() * 0.6 + 0.3
-            });
+            const sx = Math.random() * MAP_W;
+            const sy = Math.random() * MAP_H;
+            const sr = Math.random() * 1.5 + 0.3;
+            const sa = Math.random() * 0.6 + 0.3;
+            bgCtx.beginPath();
+            bgCtx.arc(sx, sy, sr, 0, Math.PI * 2);
+            bgCtx.fillStyle = `rgba(255,255,255,${sa})`;
+            bgCtx.fill();
+        }
+
+        // Grid tenue
+        bgCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+        bgCtx.lineWidth = 1;
+        for (let gx = 0; gx <= MAP_W; gx += 100) {
+            bgCtx.beginPath(); bgCtx.moveTo(gx, 0); bgCtx.lineTo(gx, MAP_H); bgCtx.stroke();
+        }
+        for (let gy = 0; gy <= MAP_H; gy += 100) {
+            bgCtx.beginPath(); bgCtx.moveTo(0, gy); bgCtx.lineTo(MAP_W, gy); bgCtx.stroke();
         }
 
         function drawBackground() {
-            ctx.fillStyle = '#050510';
-            ctx.fillRect(0, 0, MAP_W, MAP_H);
-            stars.forEach(s => {
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-                ctx.fill();
-            });
-            // Grid tenue para dar sensación de espacio
-            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-            ctx.lineWidth = 1;
-            for (let gx = 0; gx <= MAP_W; gx += 100) {
-                ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, MAP_H); ctx.stroke();
-            }
-            for (let gy = 0; gy <= MAP_H; gy += 100) {
-                ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(MAP_W, gy); ctx.stroke();
-            }
+            ctx.drawImage(bgCanvas, 0, 0);
         }
 
         // =============================================================
@@ -609,7 +613,7 @@
                     this.health = 200; this.maxHealth = 200; this.fireRate = 350;
                 } else if (this.type === '327') {
                     this.health = 75; this.maxHealth = 75; this.speed = 6.25;
-                    this.fireRate = 300; this.piercingShots = true; this.skills.push('Disparo Penetrante');
+                    this.fireRate = 300; this.piercingShots = true;
                 } else if (this.type === 'rex') {
                     this.health = 300; this.maxHealth = 300; this.damage = 15;
                 } else if (this.type === 'arc') {
@@ -620,7 +624,7 @@
                     this.health = 400; this.maxHealth = 400; this.speed = 4;
                     this.bulletSize = 10; this.damage = 25; this.fireRate = 500;
                     this.projectileSpeed = 5; this.piercingShots = true;
-                    this.skills.push('Balas Masivas'); this.skills.push('Disparo Penetrante');
+                    this.skills.push('Balas Masivas');
                     this.width = 50; this.height = 70;
                 }
             }
@@ -700,6 +704,7 @@
                 let bSize = this.bulletSize;
                 let bColor = '#00FFFF';
                 if (this.type === 'commando') { bColor = '#fff'; }
+                else if (this.explosiveShots) { bColor = '#FF6600'; }
                 else if (this.tripleShot) { bColor = '#fff'; }
                 else if (this.piercingShots) { bColor = '#fff'; }
 
@@ -806,6 +811,7 @@
                 this.x = x; this.y = y; this.width = 100; this.height = 80;
                 this.health = 4000; this.maxHealth = 4000; this.isBoss = true;
                 this.hitboxRadius = 50; this.expValue = 200;
+                this.flickerTimer = 0; this.flickerOn = false;
                 this.spawnTimer = setInterval(() => {
                     if (!gamePaused && isEventActive) {
                         let d1 = new Droid(this.x + 10, this.y + this.height);
@@ -820,10 +826,14 @@
                 ctx.fillStyle = '#444'; ctx.strokeStyle = '#888'; ctx.lineWidth = 4;
                 ctx.fillRect(this.x, this.y, this.width, this.height);
                 ctx.strokeRect(this.x, this.y, this.width, this.height);
-                ctx.fillStyle = (Math.random() < 0.1) ? 'yellow' : 'red';
+                ctx.fillStyle = this.flickerOn ? 'yellow' : 'red';
                 ctx.beginPath(); ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 10, 0, Math.PI * 2); ctx.fill();
             }
-            update(player) { this.draw(); }
+            update(player) {
+                this.flickerTimer++;
+                if (this.flickerTimer >= 6) { this.flickerOn = !this.flickerOn; this.flickerTimer = 0; }
+                this.draw();
+            }
             destroy() { clearInterval(this.spawnTimer); }
         }
 
@@ -872,7 +882,7 @@
                 super(x, y);
                 this.width = 60; this.height = 60; this.health = 6000; this.maxHealth = 6000;
                 this.expValue = 250; this.speed = 3; this.projectileSpeed = 8;
-                this.hitboxRadius = 40; this.isBoss = true;
+                this.hitboxRadius = 25; this.isBoss = true;
                 this.mode = 'roll'; this.modeTimer = 0; this.shootFrame = 0;
             }
             draw() {
@@ -1064,7 +1074,7 @@
                 options = availableSkills;
                 if (options.length === 0) {
                     skillOptionsContainer.innerHTML = '<p>¡Ya tienes todo!</p>';
-                    setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }, 2000);
+                    setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = platformMode === 'mobile' ? 'default' : 'none'; if (animationId) { cancelAnimationFrame(animationId); animationId = null; } animate(); }, 2000);
                     return;
                 }
             } else {
@@ -1076,7 +1086,7 @@
                 }
                 if (options.length === 0) {
                     skillOptionsContainer.innerHTML = '<p style="color:#aaa;">¡Eres el soldado perfecto! No hay más mejoras.</p>';
-                    setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = 'none'; animate(); }, 2000);
+                    setTimeout(() => { skillModal.style.display = 'none'; gamePaused = false; canvas.style.cursor = platformMode === 'mobile' ? 'default' : 'none'; if (animationId) { cancelAnimationFrame(animationId); animationId = null; } animate(); }, 2000);
                     return;
                 }
             }
@@ -1106,6 +1116,7 @@
             healthUI.textContent = `Salud: ${Math.ceil(player.health)} / ${player.maxHealth}`;
             experienceUI.textContent = `Exp: ${Math.floor(experience)} / ${experienceNeeded}`;
             killCounterUI.textContent = `Bajas (Oro): ${droidsKilled}`;
+            document.getElementById('levelDisplay').textContent = `Nivel: ${level}`;
             if (isEventActive) {
                 const boss = droids.find(d => d.isBoss);
                 if (boss) bossHealthFill.style.width = (boss.health / boss.maxHealth * 100) + '%';
@@ -1147,7 +1158,9 @@
             player.update();
             player.shoot(mouse.x, mouse.y);
 
-            particles.forEach((p, i) => { if (p.alpha <= 0) particles.splice(i, 1); else p.update(); });
+            for (let i = particles.length - 1; i >= 0; i--) {
+                if (particles[i].alpha <= 0) particles.splice(i, 1); else particles[i].update();
+            }
 
             for (let i = projectiles.length - 1; i >= 0; i--) {
                 const proj = projectiles[i];
@@ -1289,9 +1302,7 @@
 
             if (experience >= experienceNeeded) levelUp();
 
-            droids.forEach(droid => droid.update(player));
-
-            // Separación física entre droides: se empujan entre sí al solaparse
+            // Separación física entre droides (ANTES de actualizar/dibujar para que el dibujo sea correcto)
             for (let i = 0; i < droids.length; i++) {
                 for (let j = i + 1; j < droids.length; j++) {
                     const a = droids[i], b = droids[j];
@@ -1307,16 +1318,16 @@
                     if (dist < minDist) {
                         const overlap = (minDist - dist);
                         const nx = ddx / dist, ny = ddy / dist;
-                        // Corrección de posición inmediata (la mitad cada uno)
                         a.x -= nx * overlap * 0.4; a.y -= ny * overlap * 0.4;
                         b.x += nx * overlap * 0.4; b.y += ny * overlap * 0.4;
-                        // Impulso de velocidad para que reboten
                         const impulse = overlap * 0.25;
                         a.vx -= nx * impulse; a.vy -= ny * impulse;
                         b.vx += nx * impulse; b.vy += ny * impulse;
                     }
                 }
             }
+
+            droids.forEach(droid => droid.update(player));
             updateUI();
 
             // Notificación de droides reforzados
@@ -1349,7 +1360,7 @@
                 canvas.style.cursor = 'none';
             }
             player = new Player(MAP_W / 2 - 20, MAP_H / 2 - 30, selectedCharacter);
-            droidsKilled = 0; experience = 0; level = 1;
+            droidsKilled = 0; experience = 0; level = 1; experienceNeeded = 100;
             isEventActive = false; eventToTrigger = null;
             gameOverTriggered = false;
             droidScaling = 1.0; scalingNotif = null;
@@ -1363,6 +1374,7 @@
         }
 
         loadControls();
+        scaleCanvas(); // escalar canvas desde el inicio
 
         // =============================================================
         // SELECCIÓN DE PLATAFORMA
@@ -1425,28 +1437,6 @@
         };
         joystickZone.addEventListener('touchend',    resetJoystick, { passive: false });
         joystickZone.addEventListener('touchcancel', resetJoystick, { passive: false });
-
-        // Touch en el canvas → mover mira (móvil)
-        canvas.addEventListener('touchstart', (e) => {
-            if (platformMode !== 'mobile') return;
-            e.preventDefault();
-            const t = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = MAP_W / rect.width;
-            const scaleY = MAP_H / rect.height;
-            mouse.x = (t.clientX - rect.left) * scaleX;
-            mouse.y = (t.clientY - rect.top)  * scaleY;
-        }, { passive: false });
-        canvas.addEventListener('touchmove', (e) => {
-            if (platformMode !== 'mobile') return;
-            e.preventDefault();
-            const t = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = MAP_W / rect.width;
-            const scaleY = MAP_H / rect.height;
-            mouse.x = (t.clientX - rect.left) * scaleX;
-            mouse.y = (t.clientY - rect.top)  * scaleY;
-        }, { passive: false });
     </script>
 </body>
 </html>
